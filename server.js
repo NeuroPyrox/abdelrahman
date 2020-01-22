@@ -52,13 +52,11 @@ app.post("/prices", async (req, res, next) => {
   }
 });
 
-const push = require("./order-subscriptions/push.js");
+const push = require("./push.js");
 
 app.get("/public-key", (req, res) => {
   res.send({ key: push.PUBLIC_KEY });
 });
-
-app.use("/order-subscriptions", require("./order-subscriptions/router.js"));
 
 app.use("/orders", bodyParser.urlencoded({ extended: false }));
 

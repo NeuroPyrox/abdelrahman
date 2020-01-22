@@ -1,7 +1,7 @@
 "use strict";
 
 const webPush = require("web-push");
-const database = require("../database.js");
+const database = require("./database.js");
 
 const VAPID_KEYS = {
   PUBLIC:
