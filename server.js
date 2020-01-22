@@ -28,7 +28,7 @@ app.get("/prices", async (req, res, next) => {
   }
 });
 
-const convertEntryToPriceRow = ([key, value]) => {
+function convertEntryToPriceRow([key, value]) {
   const [dish, quantityString, pickupOrDelivery] = key.split(" ");
   return {
     dish: dish,
@@ -38,7 +38,7 @@ const convertEntryToPriceRow = ([key, value]) => {
   };
 }
 
-const getPricesFromRequest = req => {
+function getPricesFromRequest(req) {
   return Object.entries(req.body).map(convertEntryToPriceRow);
 };
 
@@ -80,6 +80,62 @@ app.post("/orders", async (req, res, next) => {
     next(err);
   }
 });
+
+app.use("/order-subscriptions", bodyParser.urlencoded({ extended: false }));
+app.use("/order-subscriptions", bodyParser.json());
+
+app.post("/order-subscriptions", async (req, res, next) => {
+  try {
+    const subscription = getSubscriptionFromRequest(req);
+    await database.addSubscription(subscription);
+    res.end();
+  } catch (err) {
+    if (err === EMPTY_BODY) {
+      res.status(400);
+    }
+    next(err);
+  }
+});
+
+app.head("/order-subscriptions", async (req, res, next) => {
+  try {
+    const endpoint = req.query.endpoint;
+    const exists = await database.hasSubscription(endpoint);
+    if (!exists) {
+      res.status(404);
+    }
+    res.end();
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.delete("/order-subscriptions", async (req, res, next) => {
+  try {
+    const endpoint = req.query.endpoint;
+    await database.removeSubscription(endpoint);
+    res.end();
+  } catch (err) {
+    next(err);
+  }
+});
+
+function getSubscriptionFromRequest(req) {
+  validateNonEmptyBody(req);
+  return {
+    endpoint: req.query.endpoint,
+    keys: req.body
+  };
+};
+
+const isObjectEmpty = object => Object.keys(object) === 0;
+
+const EMPTY_BODY = Error();
+function validateNonEmptyBody(req) {
+  if (isObjectEmpty(req.body)) {
+    throw EMPTY_BODY;
+  }
+};
 
 app.listen(process.env.PORT, () => {
   console.log(`Your app is listening on port ${process.env.PORT}`);
