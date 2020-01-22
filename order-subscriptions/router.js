@@ -10,7 +10,7 @@ const bodyParser = require("body-parser");
 router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
 
-const database = require("./database.js");
+const database = require("../database.js");
 
 const isObjectEmpty = object => Object.keys(object) === 0;
 
@@ -32,7 +32,7 @@ const getSubscriptionFromRequest = req => {
 router.post("/", async (req, res, next) => {
   try {
     const subscription = getSubscriptionFromRequest(req);
-    await database.add(subscription);
+    await database.addSubscription(subscription);
     res.end();
   } catch (err) {
     if (err === EMPTY_BODY) {
@@ -45,7 +45,7 @@ router.post("/", async (req, res, next) => {
 router.head("/", async (req, res, next) => {
   try {
     const endpoint = req.query.endpoint;
-    const exists = await database.has(endpoint);
+    const exists = await database.hasSubscription(endpoint);
     if (!exists) {
       res.status(404);
     }
@@ -58,7 +58,7 @@ router.head("/", async (req, res, next) => {
 router.delete("/", async (req, res, next) => {
   try {
     const endpoint = req.query.endpoint;
-    await database.remove(endpoint);
+    await database.removeSubscription(endpoint);
     res.end();
   } catch (err) {
     next(err);

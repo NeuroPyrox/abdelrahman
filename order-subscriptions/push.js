@@ -1,7 +1,7 @@
 "use strict";
 
 const webPush = require("web-push");
-const database = require("./database.js");
+const database = require("../database.js");
 
 const VAPID_KEYS = {
   PUBLIC:
@@ -17,13 +17,13 @@ webPush.setVapidDetails(
 
 const send = async (subscription, notification) => {
   if (subscription.endpoint === null) {
-    return database.remove(null);
+    return database.removeSubscription(null);
   }
   try {
     await webPush.sendNotification(subscription, notification);
   } catch (err) {
     if (err.statusCode === 404 || err.statusCode === 410) {
-      return database.remove(subscription.endpoint);
+      return database.removeSubscription(subscription.endpoint);
     }
     throw err;
   }
@@ -38,7 +38,7 @@ exports.sendAll = async order => {
     `Quantity: ${order.quantity}`,
     `Pickup Or Delivery: ${order.pickupOrDelivery}`
   ].join("\n");
-  const subscriptions = await database.getAll();
+  const subscriptions = await database.getSubscriptions();
   const pushPromises = subscriptions.map(subscription =>
     send(subscription, notification)
   );
