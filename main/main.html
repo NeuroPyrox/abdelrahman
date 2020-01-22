@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Abdelrahman's Food</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <script src="main/main.js" defer></script>
+  </head>
+
+  <body>
+    <h1>Abdelrahman's Food</h1>
+
+    <form action="/orders" method="post" target="_blank" oninput="updatePriceOutput()">
+      Choose a dish:
+      <br />
+      <input
+        type="radio"
+        name="dish"
+        value="sweet-n-sour-chicken"
+        id="sweet-n-sour-chicken"
+        required
+      />
+      <label for="sweet-n-sour-chicken">Sweet 'n Sour Chicken</label>
+      <br />
+      <input
+        type="radio"
+        name="dish"
+        value="butter-chicken"
+        id="butter-chicken"
+        required
+      />
+      <label for="butter-chicken">Butter Chicken</label>
+      <br /><br />
+
+      Quantity:
+      <br />
+      <input
+        type="number"
+        min="1"
+        max="5"
+        name="quantity"
+        id="quantity"
+        required
+      />
+      <br /><br />
+
+      Pickup or delivery:<br />
+      <input
+        type="radio"
+        name="pickupOrDelivery"
+        value="pickup"
+        id="pickup"
+        required
+      />Pickup
+      <br />
+      <input
+        type="radio"
+        name="pickupOrDelivery"
+        value="delivery"
+        id="delivery"
+        required
+      />Delivery <br /><br />
+
+      Contact info:
+      <br />
+      <input type="text" name="contact" required />
+      <br /><br />
+
+      Price:
+      <br />
+      <output
+        name="price"
+        id="price"
+        for="sweet-n-sour-chicken butter-chicken quantity pickup delivery"
+        >$0.00</output
+      >
+      <br /><br />
+
+      <input type="submit" value="Submit" />
+    </form>
+  </body>
+</html>

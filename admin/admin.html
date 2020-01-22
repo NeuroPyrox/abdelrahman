@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Admin - Abdelrahman's Food</title>
+    <meta charset="utf-8" />
+    <script type="module" src="notification-button.js" defer></script>
+    <script type="module" src="price-table.js" defer></script>
+    <script type="module" src="order-table.js" defer></script>
+  </head>
+  <body>
+    <button type="button" id="notification-button">Loading...</button>
+    <h2>
+      Prices:
+    </h2>
+    <form action="/prices" target="_blank" method="POST">
+      <table id="price-table">
+        <tr>
+          <th>Dish</th>
+          <th>Quantity</th>
+          <th>Pickup Or Delivery</th>
+          <th>Price</th>
+        </tr>
+      </table>
+
+      <input type="submit" value="Save Prices" />
+    </form>
+    <h2>
+      Orders:
+    </h2>
+    <table id="order-table">
+      <tr>
+        <th>Time</th>
+        <th>Contact</th>
+        <th>Dish</th>
+        <th>Quantity</th>
+        <th>Pickup Or Delivery</th>
+        <th>Price</th>
+      </tr>
+    </table>
+  </body>
+</html>
