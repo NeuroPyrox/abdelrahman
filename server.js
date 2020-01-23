@@ -71,6 +71,7 @@ app.get("/orders", async (req, res, next) => {
 
 app.post("/orders", async (req, res, next) => {
   try {
+    preprocessOrderBody(req.body)
     await database.addOrder(req.body);
     await push.sendAll(req.body);
     res.send("Submitted!");
@@ -78,6 +79,15 @@ app.post("/orders", async (req, res, next) => {
     next(err);
   }
 });
+
+function preprocessOrderBody(order) {
+  if (order.pickupOrDelivery === "pickup") {
+    order.delivery = false;
+  } else if (order.pickupOrDelivery === "delivery") {
+    order.delivery = true;
+  }
+  delete order.pickupOrDelivery
+}
 
 app.use("/order-subscriptions", bodyParser.urlencoded({ extended: false }));
 app.use("/order-subscriptions", bodyParser.json());

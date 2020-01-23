@@ -1,5 +1,43 @@
 "use strict";
 
+async function updatePriceOutput() {
+  try {
+    const price = await getPrice();
+    setPriceOutput(price);
+  } catch (err) {
+    console.error(err);
+    alert(
+      "You just found a bug! Go to your browser's console for more details"
+    );
+  }
+};
+
+function getPrice() {
+  const numMeals = getNumMeals();
+  const mealRate = getMealRate(numMeals);
+  return numMeals * mealRate
+};
+
+function getNumMeals() {
+  return getSweetNSourChickenQuantity() + getButterChickenQuantity()
+}
+
+function getSweetNSourChickenQuantity() {
+  const element = document.getElementById("sweetNSourQuantity");
+  if (!element.checkValidity()) {
+    return 0;
+  }
+  return parseInt(element.value);
+}
+
+function getButterChickenQuantity() {
+  const element = document.getElementById("butterChickenQuantity");
+  if (!element.checkValidity()) {
+    return 0;
+  }
+  return parseInt(element.value);
+}
+
 const getRadioValue = name => {
   const selector = `input[name=${name}]:checked`;
   const element = document.querySelector(selector);
@@ -13,92 +51,30 @@ const getDish = () => {
   return getRadioValue("dish");
 };
 
-const getQuantity = () => {
-  const element = document.getElementById("quantity");
-  if (!element.checkValidity()) {
-    return null;
-  }
-  return parseInt(element.value);
-};
-
 const getPickupOrDelivery = () => {
   return getRadioValue("pickupOrDelivery");
 };
 
-const getPriceParams = () => {
-  return {
-    dish: getDish(),
-    quantity: getQuantity(),
-    pickupOrDelivery: getPickupOrDelivery()
-  };
-};
+const mealRates = [
+  {minMeals: 16, rate: 1000},
+  {minMeals: 11, rate: 1200},
+  {minMeals: 4, rate: 1250},
+  {minMeals: 3, rate: 1266 + (2/3)},
+  {minMeals: 2, rate: 1300},
+  {minMeals: 0, rate: 1400}
+]
 
-const arePriceParamsComplete = priceParams => {
-  if (priceParams.dish === null) {
-    return false;
+function getMealRate(numMeals) {
+  for (const {minMeals, rate} of mealRates) {
+    if (minMeals <= numMeals) {
+      return rate;
+    }
   }
-  if (priceParams.quantity === null) {
-    return false;
-  }
-  if (priceParams.pickupOrDelivery === null) {
-    return false;
-  }
-  return true;
-};
+}
 
-const getPriceTable = async () => {
-  const res = await fetch("/prices");
-  const body = await res.json();
-  return body.prices;
-};
-
-const priceTablePromise = getPriceTable();
-
-const doPriceParamsMatch = (priceParams, pricing) => {
-  if (priceParams.dish !== pricing.dish) {
-    return false;
-  }
-  if (priceParams.quantity !== pricing.quantity) {
-    return false;
-  }
-  if (priceParams.pickupOrDelivery !== pricing.pickupOrDelivery) {
-    return false;
-  }
-  return true;
-};
-
-const queryPriceTable = async priceParams => {
-  const priceTable = await priceTablePromise;
-  const pricing = priceTable.find(pricing =>
-    doPriceParamsMatch(priceParams, pricing)
-  );
-  return pricing.price;
-};
-
-const getPrice = async () => {
-  const priceParams = getPriceParams();
-  if (!arePriceParamsComplete(priceParams)) {
-    return 0;
-  }
-  const price = await queryPriceTable(priceParams);
-  return price;
-};
-
-const formatPrice = price => `\$${price.toFixed(2)}`;
+const formatPrice = price => `${price} ft`;
 
 const setPriceOutput = price => {
   const element = document.getElementById("price");
   element.value = formatPrice(price);
-};
-
-const updatePriceOutput = async () => {
-  try {
-    const price = await getPrice();
-    setPriceOutput(price);
-  } catch (err) {
-    console.error(err);
-    alert(
-      "You just found a bug! Go to your browser's console for more details"
-    );
-  }
 };

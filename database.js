@@ -1,9 +1,15 @@
 "use strict";
 
-const Promise = require("bluebird");
-const sqlite3Async = Promise.promisifyAll(require("sqlite3"));
+// TODO test if contactInfo can be stored and retrieved if it has unsafe characters
 
-const database = new sqlite3Async.Database(".data/database.db");
+const { promisify } = require("util")
+const sqlite3 = require("sqlite3");
+const Joi = require("joi");
+
+const database = new sqlite3.Database(".data/database.db");
+const run = promisify(database.run.bind(database));
+const all = promisify(database.all.bind(database));
+const get = promisify(database.get.bind(database));
 
 exports.getPrices = getPrices;
 exports.setPrices = setPrices;
@@ -15,7 +21,7 @@ exports.hasSubscription = hasSubscription;
 exports.removeSubscription = removeSubscription;
 
 async function getPrices() {
-  return database.all("SELECT * FROM Prices");
+  return all("SELECT * FROM Prices");
 }
 
 async function setPrices(prices) {
@@ -24,33 +30,47 @@ async function setPrices(prices) {
 }
 
 async function getOrders() {
-  return database.all("SELECT * FROM Orders");
+  return all("SELECT * FROM Orders");
 }
 
-async function addOrder({ dish, quantity, pickupOrDelivery, contact }) {
-  const timestamp = Date.now();
-  await database.run(
-    "INSERT INTO Orders (dish, quantity, pickupOrDelivery, contact, timestamp) VALUES (?, ?, ?, ?, ?)",
-    [dish, quantity, pickupOrDelivery, contact, timestamp]
+async function addOrder(order) {
+  validateOrder(order);
+  await run(
+    `INSERT INTO Orders (
+      timestamp, 
+      butterChickenQuantity, 
+      butterChickenSpiceLevel, 
+      sweetNSourQuantity, 
+      delivery, 
+      contactInfo) 
+    VALUES (?, ?, ?, ?, ?, ?)`,
+    [
+      Date.now(),
+      order.butterChickenQuantity,
+      order.butterChickenSpiceLevel,
+      order.sweetNSourQuantity,
+      order.delivery,
+      order.contactInfo
+    ]
   );
 }
 
 async function addSubscription(subscription) {
   const { endpoint } = subscription;
   const { p256dh, auth } = subscription.keys;
-  await database.run(
+  await run(
     "INSERT INTO Subscriptions (endpoint, p256dh, auth) VALUES (?, ?, ?)",
     [endpoint, p256dh, auth]
   );
 }
 
 async function getSubscriptions() {
-  const rows = await database.all("SELECT endpoint, p256dh, auth FROM Subscriptions");
+  const rows = await all("SELECT endpoint, p256dh, auth FROM Subscriptions");
   return rows.map(convertRowToSubscription);
 }
 
 async function hasSubscription(endpoint) {
-  const selection = await database.get(
+  const selection = await get(
     "SELECT 1 FROM Subscriptions WHERE endpoint=?",
     endpoint
   );
@@ -58,7 +78,7 @@ async function hasSubscription(endpoint) {
 }
 
 async function removeSubscription(endpoint) {
-  await database.run("DELETE FROM Subscriptions WHERE endpoint=?", endpoint);
+  await run("DELETE FROM Subscriptions WHERE endpoint=?", endpoint);
 }
 
 /////////////////////////
@@ -67,19 +87,26 @@ async function removeSubscription(endpoint) {
 
 // Table resetters
 
+async function resetOrderTable() {
+  await database.run("DROP TABLE Orders");
+  await database.run(
+    `CREATE TABLE Orders (
+      timestamp INT,
+      butterChickenQuantity INT, 
+      butterChickenSpiceLevel TEXT,
+      sweetNSourQuantity INT,
+      delivery BOOL,
+      contactInfo TEXT
+    )`
+  );
+}
+
 async function resetPriceTable() {
   await database.run("DROP TABLE Prices");
   await database.run(
     "CREATE TABLE Prices (dish TEXT, quantity INT, pickupOrDelivery TEXT, price DECIMAL(9,2))"
   );
   await insertNullPrices();
-}
-
-async function resetOrderTable() {
-  await database.run("DROP TABLE Orders");
-  await database.run(
-    "CREATE TABLE Orders (dish TEXT, quantity INT, pickupOrDelivery TEXT, contact TEXT, timestamp INT)"
-  );
 }
 
 async function resetSubscriptionTable() {
@@ -131,4 +158,28 @@ function convertRowToSubscription({ endpoint, p256dh, auth }) {
       auth: auth
     }
   };
+}
+
+const orderSchema = Joi.object().keys({
+  butterChickenQuantity: Joi.number().integer().min(0).required(),
+  butterChickenSpiceLevel: Joi.string().only("notSpicy", "mild", "hot"),
+  sweetNSourQuantity: Joi.number().integer().min(0).required(),
+  delivery: Joi.boolean().required(),
+  contactInfo: Joi.string().required()
+})
+
+function validateOrder(order) {
+  const err = orderSchema.validate(order).error;
+  if (err !== null) {
+    throw Error(err.details[0].message)
+  }
+  if (order.butterChickenQuantity === 0) {
+    if (order.butterChickenSpiceLevel !== null) {
+      throw Error("Expected butterChickenSpiceLevel to be null when butterChickenQuantity is 0")
+    }
+  } else {
+    if (!order.butterChickenSpiceLevel) {
+      throw Error("Expected butterChickenSpiceLevel when butterChickenQuantity is above 0")
+    }
+  }
 }
