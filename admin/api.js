@@ -57,17 +57,10 @@ const getOrders = async () => {
   return res.json();
 };
 
-const getPrices = async () => {
-  const res = await fetch("/prices");
-  const body = await res.json();
-  return body.prices;
-};
-
 export {
   getPublicKey,
   addSubscription,
   removeSubscription,
   hasSubscription,
-  getOrders,
-  getPrices
+  getOrders
 };

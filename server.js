@@ -16,42 +16,6 @@ app.use("/main", express.static("main"));
 
 const database = require("./database.js");
 const bodyParser = require("body-parser");
-
-app.use("/prices", bodyParser.urlencoded({ extended: false }));
-
-app.get("/prices", async (req, res, next) => {
-  try {
-    const prices = await database.getPrices();
-    res.send({ prices: prices });
-  } catch (err) {
-    next(err);
-  }
-});
-
-function convertEntryToPriceRow([key, value]) {
-  const [dish, quantityString, pickupOrDelivery] = key.split(" ");
-  return {
-    dish: dish,
-    quantity: parseFloat(quantityString),
-    pickupOrDelivery: pickupOrDelivery,
-    price: parseFloat(value)
-  };
-}
-
-function getPricesFromRequest(req) {
-  return Object.entries(req.body).map(convertEntryToPriceRow);
-};
-
-app.post("/prices", async (req, res, next) => {
-  try {
-    const prices = getPricesFromRequest(req);
-    await database.setPrices(prices);
-    res.send("Saved!");
-  } catch (err) {
-    next(err);
-  }
-});
-
 const push = require("./push.js");
 
 app.get("/public-key", (req, res) => {
