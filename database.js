@@ -1,7 +1,9 @@
 "use strict";
 
-const sqlite3 = require("sqlite3");
-const database = new sqlite3.Database(".data/database.db");
+const Promise = require("bluebird");
+const sqlite3Async = Promise.promisifyAll(require("sqlite3"));
+
+const database = new sqlite3Async.Database(".data/database.db");
 
 exports.getPrices = getPrices;
 exports.setPrices = setPrices;
@@ -13,7 +15,7 @@ exports.hasSubscription = hasSubscription;
 exports.removeSubscription = removeSubscription;
 
 async function getPrices() {
-  return all("SELECT * FROM Prices");
+  return database.all("SELECT * FROM Prices");
 }
 
 async function setPrices(prices) {
@@ -22,12 +24,12 @@ async function setPrices(prices) {
 }
 
 async function getOrders() {
-  return all("SELECT * FROM Orders");
+  return database.all("SELECT * FROM Orders");
 }
 
 async function addOrder({ dish, quantity, pickupOrDelivery, contact }) {
   const timestamp = Date.now();
-  await run(
+  await database.run(
     "INSERT INTO Orders (dish, quantity, pickupOrDelivery, contact, timestamp) VALUES (?, ?, ?, ?, ?)",
     [dish, quantity, pickupOrDelivery, contact, timestamp]
   );
@@ -36,19 +38,19 @@ async function addOrder({ dish, quantity, pickupOrDelivery, contact }) {
 async function addSubscription(subscription) {
   const { endpoint } = subscription;
   const { p256dh, auth } = subscription.keys;
-  await run(
+  await database.run(
     "INSERT INTO Subscriptions (endpoint, p256dh, auth) VALUES (?, ?, ?)",
     [endpoint, p256dh, auth]
   );
 }
 
 async function getSubscriptions() {
-  const rows = await all("SELECT endpoint, p256dh, auth FROM Subscriptions");
+  const rows = await database.all("SELECT endpoint, p256dh, auth FROM Subscriptions");
   return rows.map(convertRowToSubscription);
 }
 
 async function hasSubscription(endpoint) {
-  const selection = await get(
+  const selection = await database.get(
     "SELECT 1 FROM Subscriptions WHERE endpoint=?",
     endpoint
   );
@@ -56,58 +58,33 @@ async function hasSubscription(endpoint) {
 }
 
 async function removeSubscription(endpoint) {
-  await run("DELETE FROM Subscriptions WHERE endpoint=?", endpoint);
+  await database.run("DELETE FROM Subscriptions WHERE endpoint=?", endpoint);
 }
 
 /////////////////////////
 // Non-exported functions
 /////////////////////////
 
-// Sqlite3 helpers
-
-async function run(sql, params = []) {
-  const err = await new Promise((resolve, reject) => {
-    database.run(sql, params, resolve);
-  });
-  assertNoError(err);
-}
-
-async function all(sql, params = []) {
-  const [err, rows] = await new Promise((resolve, reject) => {
-    database.all(sql, params, (err, rows) => resolve([err, rows]));
-  });
-  assertNoError(err);
-  return rows;
-}
-
-async function get(sql, params = []) {
-  const [err, result] = await new Promise((resolve, reject) => {
-    database.get(sql, params, (err, row) => resolve([err, row]));
-  });
-  assertNoError(err);
-  return result;
-}
-
 // Table resetters
 
 async function resetPriceTable() {
-  await run("DROP TABLE Prices");
-  await run(
+  await database.run("DROP TABLE Prices");
+  await database.run(
     "CREATE TABLE Prices (dish TEXT, quantity INT, pickupOrDelivery TEXT, price DECIMAL(9,2))"
   );
   await insertNullPrices();
 }
 
 async function resetOrderTable() {
-  await run("DROP TABLE Orders");
-  await run(
+  await database.run("DROP TABLE Orders");
+  await database.run(
     "CREATE TABLE Orders (dish TEXT, quantity INT, pickupOrDelivery TEXT, contact TEXT, timestamp INT)"
   );
 }
 
 async function resetSubscriptionTable() {
-  await run("DROP TABLE Subscriptions");
-  await run(
+  await database.run("DROP TABLE Subscriptions");
+  await database.run(
     "CREATE TABLE Subscriptions (endpoint TEXT, p256dh TEXT, auth TEXT)"
   );
 }
@@ -116,7 +93,7 @@ async function resetSubscriptionTable() {
 
 async function insertNullPrices() {
   for (const { dish, quantity, pickupOrDelivery } of permutePriceParams()) {
-    await run(
+    await database.run(
       "INSERT INTO Prices (dish, quantity, pickupOrDelivery) VALUES (?, ?, ?)",
       [dish, quantity, pickupOrDelivery]
     );
@@ -140,7 +117,7 @@ function permutePriceParams() {
 }
 
 async function updatePrice({ dish, quantity, pickupOrDelivery, price }) {
-  await run(
+  await database.run(
     "UPDATE Prices SET price=? WHERE dish=? AND quantity=? AND pickupOrDelivery=?",
     [price, dish, quantity, pickupOrDelivery]
   );
@@ -154,10 +131,4 @@ function convertRowToSubscription({ endpoint, p256dh, auth }) {
       auth: auth
     }
   };
-}
-
-function assertNoError(err) {
-  if (err) {
-    throw Error(err);
-  }
 }
