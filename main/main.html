@@ -13,39 +13,56 @@
   <body>
     <h1>Abdelrahman's Food</h1>
 
-    <form action="/orders" method="post" target="_blank" oninput="updatePriceOutput()">
-      Choose a dish:
-      <br />
-      <input
-        type="radio"
-        name="dish"
-        value="sweet-n-sour-chicken"
-        id="sweet-n-sour-chicken"
-        required
-      />
-      <label for="sweet-n-sour-chicken">Sweet 'n Sour Chicken</label>
-      <br />
-      <input
-        type="radio"
-        name="dish"
-        value="butter-chicken"
-        id="butter-chicken"
-        required
-      />
-      <label for="butter-chicken">Butter Chicken</label>
-      <br /><br />
-
-      Quantity:
+    <form
+      action="/orders"
+      method="post"
+      target="_blank"
+      oninput="updatePriceOutput()"
+    >
+      Sweet 'n Sour Chicken:
       <br />
       <input
         type="number"
-        min="1"
-        max="5"
-        name="quantity"
-        id="quantity"
+        min="0"
+        name="sweetNSourQuantity"
+        id="sweetNSourQuantity"
         required
       />
       <br /><br />
+
+      Butter Chicken:
+      <br />
+      <input
+        type="number"
+        min="0"
+        name="butterChickenQuantity"
+        id="butterChickenQuantity"
+        required
+      />
+      <br />
+      <input
+        type="radio"
+        name="butterChickenSpiceLevel"
+        value="notSpicy"
+        id="notSpicy"
+        required
+      />Not Spicy
+      <br />
+      <input
+        type="radio"
+        name="butterChickenSpiceLevel"
+        value="mild"
+        id="mild"
+        required
+      />Mild
+      <br />
+      <input
+        type="radio"
+        name="butterChickenSpiceLevel"
+        value="hot"
+        id="hot"
+        required
+      />Hot<br /><br />
 
       Pickup or delivery:<br />
       <input
@@ -66,7 +83,7 @@
 
       Contact info:
       <br />
-      <input type="text" name="contact" required />
+      <input type="text" name="contactInfo" required />
       <br /><br />
 
       Price:
@@ -75,7 +92,7 @@
         name="price"
         id="price"
         for="sweet-n-sour-chicken butter-chicken quantity pickup delivery"
-        >$0.00</output
+        >0 ft</output
       >
       <br /><br />
 

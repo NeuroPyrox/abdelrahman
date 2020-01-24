@@ -1,93 +1,144 @@
 "use strict";
 
+// TODO test if contactInfo can be stored and retrieved if it has unsafe characters
+
+const { promisify } = require("util");
 const sqlite3 = require("sqlite3");
+const Joi = require("joi");
+
 const database = new sqlite3.Database(".data/database.db");
+const run = promisify(database.run.bind(database));
+const all = promisify(database.all.bind(database));
+const get = promisify(database.get.bind(database));
 
-const assertNoError = err => {
-  if (err) {
-    throw Error(err);
-  }
-};
+exports.getOrders = getOrders;
+exports.addOrder = addOrder;
+exports.addSubscription = addSubscription;
+exports.getSubscriptions = getSubscriptions;
+exports.hasSubscription = hasSubscription;
+exports.removeSubscription = removeSubscription;
 
-const run = async (sql, params = []) => {
-  const err = await new Promise((resolve, reject) => {
-    database.run(sql, params, resolve);
-  });
-  assertNoError(err);
-};
+async function getOrders() {
+  return all("SELECT * FROM Orders");
+}
 
-const all = async (sql, params = []) => {
-  const [err, rows] = await new Promise((resolve, reject) => {
-    database.all(sql, params, (err, rows) => resolve([err, rows]));
-  });
-  assertNoError(err);
-  return rows;
-};
-
-const permutePriceParams = () => {
-  const permutations = [];
-  for (const dish of ["sweet-n-sour-chicken", "butter-chicken"]) {
-    for (const quantity of [1, 2, 3, 4, 5]) {
-      for (const pickupOrDelivery of ["pickup", "delivery"]) {
-        permutations.push({
-          dish: dish,
-          quantity: quantity,
-          pickupOrDelivery: pickupOrDelivery
-        });
-      }
-    }
-  }
-  return permutations;
-};
-
-const insertNullPrice = async ({ dish, quantity, pickupOrDelivery }) => {
+async function addOrder(order) {
+  validateOrder(order);
   await run(
-    "INSERT INTO Prices (dish, quantity, pickupOrDelivery) VALUES (?, ?, ?)",
-    [dish, quantity, pickupOrDelivery]
-  );
-};
-
-const insertNullPrices = async () => {
-  for (const priceParams of permutePriceParams()) {
-    await insertNullPrice(priceParams);
-  }
-};
-
-const resetPriceTable = async () => {
-  await run("DROP TABLE Prices");
-  await run(
-    "CREATE TABLE Prices (dish TEXT, quantity INT, pickupOrDelivery TEXT, price DECIMAL(9,2))"
-  );
-  await insertNullPrices();
-};
-
-const resetOrderTable = async () => {
-  await run("DROP TABLE Orders");
-  await run(
-    "CREATE TABLE Orders (dish TEXT, quantity INT, pickupOrDelivery TEXT, contact TEXT, timestamp INT)"
+    `INSERT INTO Orders (
+      timestamp, 
+      butterChickenQuantity, 
+      butterChickenSpiceLevel, 
+      sweetNSourQuantity, 
+      delivery, 
+      contactInfo) 
+    VALUES (?, ?, ?, ?, ?, ?)`,
+    [
+      Date.now(),
+      order.butterChickenQuantity,
+      order.butterChickenSpiceLevel,
+      order.sweetNSourQuantity,
+      order.delivery,
+      order.contactInfo
+    ]
   );
 }
 
-exports.getPrices = async () => all("SELECT * FROM Prices");
-
-const updatePrice = async ({ dish, quantity, pickupOrDelivery, price }) => {
+async function addSubscription(subscription) {
+  const { endpoint } = subscription;
+  const { p256dh, auth } = subscription.keys;
   await run(
-    "UPDATE Prices SET price=? WHERE dish=? AND quantity=? AND pickupOrDelivery=?",
-    [price, dish, quantity, pickupOrDelivery]
+    "INSERT INTO Subscriptions (endpoint, p256dh, auth) VALUES (?, ?, ?)",
+    [endpoint, p256dh, auth]
   );
-};
+}
 
-exports.setPrices = async prices => {
-  const promises = prices.map(updatePrice);
-  await Promise.all(promises);
-};
+async function getSubscriptions() {
+  const rows = await all("SELECT endpoint, p256dh, auth FROM Subscriptions");
+  return rows.map(convertRowToSubscription);
+}
 
-exports.getOrders = async () => all("SELECT * FROM Orders");
-
-exports.addOrder = async ({ dish, quantity, pickupOrDelivery, contact }) => {
-  const timestamp = Date.now();
-  run(
-    "INSERT INTO Orders (dish, quantity, pickupOrDelivery, contact, timestamp) VALUES (?, ?, ?, ?, ?)",
-    [dish, quantity, pickupOrDelivery, contact, timestamp]
+async function hasSubscription(endpoint) {
+  const selection = await get(
+    "SELECT 1 FROM Subscriptions WHERE endpoint=?",
+    endpoint
   );
-};
+  return selection !== undefined;
+}
+
+async function removeSubscription(endpoint) {
+  await run("DELETE FROM Subscriptions WHERE endpoint=?", endpoint);
+}
+
+/////////////////////////
+// Non-exported functions
+/////////////////////////
+
+// Table resetters
+
+async function resetOrderTable() {
+  await database.run("DROP TABLE Orders");
+  await database.run(
+    `CREATE TABLE Orders (
+      timestamp INT,
+      butterChickenQuantity INT, 
+      butterChickenSpiceLevel TEXT,
+      sweetNSourQuantity INT,
+      delivery BOOL,
+      contactInfo TEXT
+    )`
+  );
+}
+
+async function resetSubscriptionTable() {
+  await database.run("DROP TABLE Subscriptions");
+  await database.run(
+    "CREATE TABLE Subscriptions (endpoint TEXT, p256dh TEXT, auth TEXT)"
+  );
+}
+
+// Other helper functions
+
+function convertRowToSubscription({ endpoint, p256dh, auth }) {
+  return {
+    endpoint: endpoint,
+    keys: {
+      p256dh: p256dh,
+      auth: auth
+    }
+  };
+}
+
+const orderSchema = Joi.object().keys({
+  butterChickenQuantity: Joi.number()
+    .integer()
+    .min(0)
+    .required(),
+  butterChickenSpiceLevel: Joi.string().only("notSpicy", "mild", "hot"),
+  sweetNSourQuantity: Joi.number()
+    .integer()
+    .min(0)
+    .required(),
+  delivery: Joi.boolean().required(),
+  contactInfo: Joi.string().required()
+});
+
+function validateOrder(order) {
+  const err = orderSchema.validate(order).error;
+  if (err !== null) {
+    throw Error(err.details[0].message);
+  }
+  if (order.butterChickenQuantity === 0) {
+    if (order.butterChickenSpiceLevel !== null) {
+      throw Error(
+        "Expected butterChickenSpiceLevel to be null when butterChickenQuantity is 0"
+      );
+    }
+  } else {
+    if (!order.butterChickenSpiceLevel) {
+      throw Error(
+        "Expected butterChickenSpiceLevel when butterChickenQuantity is above 0"
+      );
+    }
+  }
+}
