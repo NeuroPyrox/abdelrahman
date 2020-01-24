@@ -13,49 +13,56 @@ async function initialize() {
   showOrders(orders.reverse());
 }
 
-async function showOrders(orders) {
-  const rows = await createRows(orders);
-  element.insertAdjacentHTML('beforeend', rows)
+function showOrders(orders) {
+  const rows = createRows(orders);
+  element.insertAdjacentHTML("beforeend", rows);
 }
 
-async function createRows(orders) {
-  const separated = await Promise.all(orders.map(createRow));
-  return separated.join("");
+function createRows(orders) {
+  return orders.map(createRow).join("");
 }
 
-async function createRow(order) {
-  const { timestamp, contact, dish, quantity, pickupOrDelivery } = order;
-  const price = await getPrice(order);
-  return `
-    <tr>
-      <td>${stringifyTimestamp(timestamp)}</td>
-      <td>${contact}</td>
-      <td>${dish}</td>
-      <td>${quantity}</td>
-      <td>${pickupOrDelivery}</td>
-      <td>${price}</td>
-    </tr>`;
+function createRow(order) {
+  const tdElements = [
+    stringifyTimestamp(order.timestamp),
+    order.butterChickenQuantity,
+    stringifySpiceLevel(order.butterChickenSpiceLevel),
+    order.sweetNSourQuantity,
+    getPrice(order),
+    stringifyBool(order.delivery),
+    stringifyBool(!order.delivery),
+    order.contactInfo
+  ]
+    .map(cell => `<td>${cell}</td>`)
+    .join("");
+  return `<tr>${tdElements}</tr>`;
 }
 
-const priceTablePromise = api.getPrices();
-
-async function getPrice(order) {
-  const prices = await priceTablePromise;
-  const pricing = prices.find(pricing => doPriceParamsMatch(order, pricing));
-  return pricing.price;
+function getPrice(order) {
+  const numMeals = getNumMeals(order);
+  const mealRate = getMealRate(numMeals);
+  return numMeals * mealRate;
 }
 
-function doPriceParamsMatch(order, pricing) {
-  if (order.dish !== pricing.dish) {
-    return false;
+function getNumMeals(order) {
+  return order.butterChickenQuantity + order.sweetNSourQuantity;
+}
+
+const mealRates = [
+  { minMeals: 16, rate: 1000 },
+  { minMeals: 11, rate: 1200 },
+  { minMeals: 4, rate: 1250 },
+  { minMeals: 3, rate: 1266 + 2 / 3 },
+  { minMeals: 2, rate: 1300 },
+  { minMeals: 0, rate: 1400 }
+];
+
+function getMealRate(numMeals) {
+  for (const { minMeals, rate } of mealRates) {
+    if (minMeals <= numMeals) {
+      return rate;
+    }
   }
-  if (order.quantity !== pricing.quantity) {
-    return false;
-  }
-  if (order.pickupOrDelivery !== pricing.pickupOrDelivery) {
-    return false;
-  }
-  return true;
 }
 
 function stringifyTimestamp(timestamp) {
@@ -73,4 +80,15 @@ function stringifyTimestamp(timestamp) {
     ":",
     date.getSeconds()
   ].join("");
-};
+}
+
+function stringifySpiceLevel(spiceLevel) {
+  if (spiceLevel === "notSpicy") {
+    return "not spicy";
+  }
+  return spiceLevel;
+}
+
+function stringifyBool(bool) {
+  return bool ? "yes" : "no";
+}

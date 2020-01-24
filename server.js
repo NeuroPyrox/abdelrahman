@@ -51,6 +51,8 @@ function preprocessOrderBody(order) {
     order.delivery = true;
   }
   delete order.pickupOrDelivery
+  order.butterChickenQuantity = parseInt(order.butterChickenQuantity)
+  order.sweetNSourQuantity = parseInt(order.sweetNSourQuantity)
 }
 
 app.use("/order-subscriptions", bodyParser.urlencoded({ extended: false }));
