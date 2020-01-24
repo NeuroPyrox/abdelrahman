@@ -7,40 +7,17 @@
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
-    <script src="main/main.js" defer></script>
+    <script src="main/bundle.js" defer></script>
+    <link rel="stylesheet" type="text/css" href="main/main.css" />
   </head>
 
   <body>
     <h1>Abdelrahman's Food</h1>
+    <form action="/orders" method="post" target="_blank" id="orderForm">
+      <div id="menu"></div>
 
-    <form
-      action="/orders"
-      method="post"
-      target="_blank"
-      oninput="updatePriceOutput()"
-    >
-      Sweet 'n Sour Chicken:
-      <br />
-      <input
-        type="number"
-        min="0"
-        name="sweetNSourQuantity"
-        id="sweetNSourQuantity"
-        required
-      />
-      <br /><br />
-
-      Butter Chicken:
-      <br />
-      <input
-        type="number"
-        min="0"
-        name="butterChickenQuantity"
-        id="butterChickenQuantity"
-        required
-      />
-      <br />
-      <input
+      <br>Butter Chicken Spice Level:
+      <br><input
         type="radio"
         name="butterChickenSpiceLevel"
         value="notSpicy"

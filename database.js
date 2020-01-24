@@ -4,7 +4,7 @@
 
 const { promisify } = require("util");
 const sqlite3 = require("sqlite3");
-const Joi = require("joi");
+const Joi = require("@hapi/joi");
 
 const database = new sqlite3.Database(".data/database.db");
 const run = promisify(database.run.bind(database));
@@ -74,10 +74,7 @@ async function removeSubscription(endpoint) {
 // Non-exported functions
 /////////////////////////
 
-// Table resetters
-
-async function resetOrderTable() {
-  await database.run("DROP TABLE Orders");
+async function createOrderTable() {
   await database.run(
     `CREATE TABLE Orders (
       timestamp INT,
@@ -90,14 +87,15 @@ async function resetOrderTable() {
   );
 }
 
-async function resetSubscriptionTable() {
-  await database.run("DROP TABLE Subscriptions");
+async function createSubscriptionTable() {
   await database.run(
     "CREATE TABLE Subscriptions (endpoint TEXT, p256dh TEXT, auth TEXT)"
   );
 }
 
-// Other helper functions
+async function createTables() {
+  await Promise.all([createOrderTable(), createSubscriptionTable()]);
+}
 
 function convertRowToSubscription({ endpoint, p256dh, auth }) {
   return {
@@ -114,7 +112,7 @@ const orderSchema = Joi.object().keys({
     .integer()
     .min(0)
     .required(),
-  butterChickenSpiceLevel: Joi.string().only("notSpicy", "mild", "hot"),
+  butterChickenSpiceLevel: Joi.string().valid("notSpicy", "mild", "hot"),
   sweetNSourQuantity: Joi.number()
     .integer()
     .min(0)
@@ -125,8 +123,8 @@ const orderSchema = Joi.object().keys({
 
 function validateOrder(order) {
   const err = orderSchema.validate(order).error;
-  if (err !== null) {
-    throw Error(err.details[0].message);
+  if (err !== undefined) {
+    throw Error(JSON.stringify(err, null, 2));
   }
   if (order.butterChickenQuantity === 0) {
     if (order.butterChickenSpiceLevel !== null) {
