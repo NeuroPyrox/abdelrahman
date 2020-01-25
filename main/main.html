@@ -8,72 +8,9 @@
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
     <script src="main/bundle.js" defer></script>
-    <link rel="stylesheet" type="text/css" href="main/main.css" />
   </head>
 
   <body>
-    <h1>Abdelrahman's Food</h1>
-    <form action="/orders" method="post" target="_blank" id="orderForm">
-      <div id="menu"></div>
-
-      <br>Butter Chicken Spice Level:
-      <br><input
-        type="radio"
-        name="butterChickenSpiceLevel"
-        value="notSpicy"
-        id="notSpicy"
-        required
-      />Not Spicy
-      <br />
-      <input
-        type="radio"
-        name="butterChickenSpiceLevel"
-        value="mild"
-        id="mild"
-        required
-      />Mild
-      <br />
-      <input
-        type="radio"
-        name="butterChickenSpiceLevel"
-        value="hot"
-        id="hot"
-        required
-      />Hot<br /><br />
-
-      Pickup or delivery:<br />
-      <input
-        type="radio"
-        name="pickupOrDelivery"
-        value="pickup"
-        id="pickup"
-        required
-      />Pickup
-      <br />
-      <input
-        type="radio"
-        name="pickupOrDelivery"
-        value="delivery"
-        id="delivery"
-        required
-      />Delivery <br /><br />
-
-      Contact info:
-      <br />
-      <input type="text" name="contactInfo" required />
-      <br /><br />
-
-      Price:
-      <br />
-      <output
-        name="price"
-        id="price"
-        for="sweet-n-sour-chicken butter-chicken quantity pickup delivery"
-        >0 ft</output
-      >
-      <br /><br />
-
-      <input type="submit" value="Submit" />
-    </form>
+    <div id="main" />
   </body>
 </html>

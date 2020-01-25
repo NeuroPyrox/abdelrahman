@@ -12,8 +12,8 @@ const formatAction = {
 };
 
 module.exports = class notificationButton extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       action: "loading"
     };
