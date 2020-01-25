@@ -7,7 +7,7 @@ app.get("/", (req, res) => {
   res.sendFile(`${__dirname}/main/main.html`);
 });
 
-// Ensure trailing slash on url
+// Ensure trailing slash
 app.get(/^\/admin$/, function(req, res) {
   res.redirect("/admin/")
 })
