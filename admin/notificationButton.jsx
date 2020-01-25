@@ -1,7 +1,7 @@
 const React = require("react");
 const ReactDOM = require("react-dom");
-const push = require("./push.js");
-const { foundBug } = require("./helper.js");
+const push = require("./push.jsx");
+const { foundBug } = require("./helper.jsx");
 
 // TODO listen for outside subscription changes
 

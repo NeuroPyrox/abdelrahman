@@ -7,6 +7,7 @@ const Joi = require("@hapi/joi");
 
 const database = new sqlite3.Database(".data/database.db");
 
+ensureTableExists("Prices", "numMeals INT, price INT");
 ensureTableExists("Subscriptions", "endpoint TEXT, p256dh TEXT, auth TEXT");
 ensureTableExists(
   "Orders",

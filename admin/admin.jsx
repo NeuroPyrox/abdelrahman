@@ -2,8 +2,8 @@
 const React = require("react");
 const ReactDOM = require("react-dom");
 // TODO change extensions to jsx
-const NotificationButton = require("./notificationButton.js")
-const OrderTable = require("./orderTable.js")
+const NotificationButton = require("./notificationButton.jsx")
+const OrderTable = require("./orderTable.jsx")
 
 ReactDOM.render(<Main />, document.getElementById("main"));
 
