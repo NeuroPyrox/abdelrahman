@@ -1,7 +1,7 @@
 module.exports = {
   mode: "development",
   context: `${__dirname}/`,
-  entry: { main: "./main/main.jsx", admin: "./admin/admin.jsx" },
+  entry: { main: "./main/entry.jsx", admin: "./admin/entry.jsx" },
   output: {
     path: __dirname,
     filename: "[name]/bundle.js"
