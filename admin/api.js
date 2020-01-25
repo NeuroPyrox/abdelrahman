@@ -57,10 +57,8 @@ const getOrders = async () => {
   return res.json();
 };
 
-export {
-  getPublicKey,
-  addSubscription,
-  removeSubscription,
-  hasSubscription,
-  getOrders
-};
+exports.getPublicKey = getPublicKey;
+exports.addSubscription = addSubscription;
+exports.removeSubscription = removeSubscription;
+exports.hasSubscription = hasSubscription;
+exports.getOrders = getOrders;

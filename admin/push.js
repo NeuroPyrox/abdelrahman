@@ -1,26 +1,26 @@
 "use strict";
 
-import * as api from "./api.js";
+const api = require("./api.js");
 
-export const subscribe = async () => {
-  const subscription = await createSubscription();
-  await api.addSubscription(subscription);
-};
+module.exports = {
+  subscribe: async function subscribe() {
+    const subscription = await createSubscription();
+    await api.addSubscription(subscription);
+  },
 
-export const unsubscribe = async () => {
-  const subscription = await createSubscription();
-  await api.removeSubscription(subscription.endpoint);
-};
+  unsubscribe: async function unsubscribe() {
+    const subscription = await createSubscription();
+    await api.removeSubscription(subscription.endpoint);
+  },
 
-export const isSubscribed = async () => {
-  const subscription = await getExistingSubscription();
-  if (subscription === null) {
-    return false;
+  isSubscribed: async function isSubscribed() {
+    const subscription = await getExistingSubscription();
+    if (subscription === null) {
+      return false;
+    }
+    return api.hasSubscription(subscription.endpoint);
   }
-  return api.hasSubscription(subscription.endpoint);
 };
-
-// No more exports after this point
 
 // Always check if the output is null
 const getExistingSubscription = async () => {
@@ -59,7 +59,7 @@ const askPushPermission = async () => {
       promise.then(resolve, reject);
     }
   });
-  assert(result === 'granted', "Push Permission denied!")
+  assert(result === "granted", "Push Permission denied!");
 };
 
 const assert = (condition, message) => {
