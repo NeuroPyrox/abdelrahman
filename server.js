@@ -12,10 +12,25 @@ initializeServer({
 
   "/public-vapid-key": staticJson({ key: process.env.PUBLIC_VAPID_KEY }),
 
-  "/prices": collection(prices), // Get all, admin set all
-  "/orders": orders, // Post and notify, admin get all
-  "/admin-push-subscriptions/:endpoint": adminPushSubscriptions, // has, add, remove, admin
-})
+  "/prices": collection(prices),
+
+  "/prices": collection(prices, {
+    GET: [],
+    PUT: [adminOnly]
+  }),
+  "/orders": collection(orders, {
+    POST: [thenNotifyAdmin],
+    GET: [adminOnly]
+  }),
+  "/admin-push-subscriptions/:endpoint": collection(
+    ({ endpoint }) => adminPushSubscriptions.at(endpoint),
+    {
+      HEAD: [adminOnly],
+      PUT: [adminOnly],
+      DELETE: [adminOnly]
+    }
+  )
+});
 
 function initializeServer(resourcePaths) {
   const express = require("express");
