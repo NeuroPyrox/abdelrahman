@@ -3,16 +3,11 @@
 const webPush = require("web-push");
 const database = require("./database.js");
 
-const VAPID_KEYS = {
-  PUBLIC:
-    "BIUOQOf-H_fb4IjS4enikFwikqqYb3q40dDAnoDyvQXolRi3BBXGdfSCGG6X25ulzXLaUhrcDU_Ce6HExwPm6yM",
-  PRIVATE: "wotDHRrCXqm11JCXAkM8ien-ElgJPZLe0TDxC5I6eus"
-};
-
+// TODO set as Abdelrahman's email
 webPush.setVapidDetails(
   "mailto:NeuroPyrox@Gmail.com",
-  VAPID_KEYS.PUBLIC,
-  VAPID_KEYS.PRIVATE
+  process.env.PUBLIC_VAPID_KEY,
+  process.env.PRIVATE_VAPID_KEY
 );
 
 const send = async (subscription, notification) => {
@@ -28,8 +23,6 @@ const send = async (subscription, notification) => {
     throw err;
   }
 };
-
-exports.PUBLIC_KEY = VAPID_KEYS.PUBLIC;
 
 exports.sendAll = async order => {
   const notification = stringifyOrder(order);

@@ -1,7 +1,6 @@
 "use strict";
 
 const React = require("react");
-const ReactDOM = require("react-dom");
 
 module.exports = class Menu extends React.Component {
   constructor(props) {

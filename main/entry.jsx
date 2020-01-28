@@ -1,8 +1,5 @@
 "use strict";
 
-// TODO rename sweetNSour to sweetNSourChicken in all files
-
-const React = require("react");
 const ReactDOM = require("react-dom");
 const Form = require("./Form.jsx");
 

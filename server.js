@@ -1,121 +1,98 @@
 "use strict";
 
-const express = require("express");
-const app = express();
+const resource = require("resource.js");
 
-app.get("/", (req, res) => {
-  res.sendFile(`${__dirname}/main/main.html`);
-});
+initializeServer({
+  "/": staticFile("/main/main.html"),
+  "/admin/": redirect("/admin"),
+  "/admin": staticFile("/admin/admin.html"),
 
-// Ensure trailing slash
-app.get(/^\/admin$/, function(req, res) {
-  res.redirect("/admin/")
+  "/main/bundle.js": staticFile("/main/bundle.js"),
+  "/admin/bundle.js": staticFile("/admin/bundle.js"),
+
+  "/public-vapid-key": staticJson({ key: process.env.PUBLIC_VAPID_KEY }),
+
+  "/prices": collection(prices), // Get all, admin set all
+  "/orders": orders, // Post and notify, admin get all
+  "/admin-push-subscriptions/:endpoint": adminPushSubscriptions, // has, add, remove, admin
 })
 
-app.get("/admin/", (req, res) => {
-  res.sendFile(`${__dirname}/admin/admin.html`);
-});
-
-app.use("/admin", express.static("admin"));
-app.use("/main", express.static("main"));
-
-const database = require("./database.js");
-const bodyParser = require("body-parser");
-const push = require("./push.js");
-
-app.get("/public-key", (req, res) => {
-  res.send({ key: push.PUBLIC_KEY });
-});
-
-app.use("/orders", bodyParser.urlencoded({ extended: false }));
-
-app.get("/orders", async (req, res, next) => {
-  try {
-    const orders = await database.getOrders();
-    res.send(orders);
-  } catch (err) {
-    next(err);
+function initializeServer(resourcePaths) {
+  const express = require("express");
+  const app = express();
+  for (const [path, resource] of Object.entries(resourcePaths)) {
+    //useResource(app, resource);
   }
-})
-
-app.post("/orders", async (req, res, next) => {
-  try {
-    preprocessOrderBody(req.body)
-    await database.addOrder(req.body);
-    await push.sendAll(req.body);
-    res.send("Submitted!");
-  } catch (err) {
-    next(err);
-  }
-});
-
-function preprocessOrderBody(order) {
-  if (order.pickupOrDelivery === "pickup") {
-    order.delivery = false;
-  } else if (order.pickupOrDelivery === "delivery") {
-    order.delivery = true;
-  }
-  delete order.pickupOrDelivery
-  order.butterChickenQuantity = parseInt(order.butterChickenQuantity)
-  order.sweetNSourQuantity = parseInt(order.sweetNSourQuantity)
+  app.listen(process.env.PORT, () => {
+    console.log(`Your app is listening on port ${process.env.PORT}`);
+  });
 }
 
-app.use("/order-subscriptions", bodyParser.urlencoded({ extended: false }));
-app.use("/order-subscriptions", bodyParser.json());
 
-app.post("/order-subscriptions", async (req, res, next) => {
-  try {
-    const subscription = getSubscriptionFromRequest(req);
-    await database.addSubscription(subscription);
-    res.end();
-  } catch (err) {
-    if (err === EMPTY_BODY) {
-      res.status(400);
+serveFile("/", "main/main.html");
+redirect("/admin", "/admin/");
+serveFile("/admin/", "admin/admin.html");
+
+serveFile("/main/bundle.js", "/main/bundle.js");
+serveFile("/admin/bundle.js", "/admin/bundle.js");
+
+
+function serveFile(to, from) {
+  router.get(to, function(req, res) {
+    res.sendFile(from);
+  });
+}
+
+function redirect(from, to) {
+  router.get(from, function(req, res) {
+    res.redirect(to);
+  });
+}
+
+///////////
+// Other //
+///////////
+
+app.get("/public-vapid-key", (req, res) => {
+  res.send({ key: process.env.PUBLIC_VAPID_KEY });
+});
+
+app.use(require("body-parser").json());
+
+// Admin Push Subscriptions
+
+app.use("/admin-push-subscriptions");
+
+app.post(
+  "/admin-push-subscriptions/insert",
+  makeMiddleware(adminPushSubscriptions.insert)
+);
+
+app.post(
+  "/admin-push-subscriptions/has",
+  makeMiddleware(adminPushSubscriptions.has)
+);
+
+app.post(
+  "/admin-push-subscriptions/remove",
+  makeMiddleware(adminPushSubscriptions.remove)
+);
+
+app.post("/prices/get-all", makeMiddleware(prices.getAll));
+
+app.post("/prices/set-all", makeMiddleware(prices.setAll));
+
+app.post("/orders/insert", makeMiddleware(orders.insert));
+
+app.post("/orders/get-all", makeMiddleware(orders.getAll));
+
+function makeMiddleware(action) {
+  return async function(req, res, next) {
+    try {
+      const result = await action(req.body);
+      res.send(result);
+    } catch (err) {
+      next(err);
     }
-    next(err);
-  }
-});
-
-app.head("/order-subscriptions", async (req, res, next) => {
-  try {
-    const endpoint = req.query.endpoint;
-    const exists = await database.hasSubscription(endpoint);
-    if (!exists) {
-      res.status(404);
-    }
-    res.end();
-  } catch (err) {
-    next(err);
-  }
-});
-
-app.delete("/order-subscriptions", async (req, res, next) => {
-  try {
-    const endpoint = req.query.endpoint;
-    await database.removeSubscription(endpoint);
-    res.end();
-  } catch (err) {
-    next(err);
-  }
-});
-
-function getSubscriptionFromRequest(req) {
-  validateNonEmptyBody(req);
-  return {
-    endpoint: req.query.endpoint,
-    keys: req.body
   };
-};
-
-const isObjectEmpty = object => Object.keys(object) === 0;
-
-const EMPTY_BODY = Error();
-function validateNonEmptyBody(req) {
-  if (isObjectEmpty(req.body)) {
-    throw EMPTY_BODY;
-  }
-};
-
-app.listen(process.env.PORT, () => {
-  console.log(`Your app is listening on port ${process.env.PORT}`);
-});
+}

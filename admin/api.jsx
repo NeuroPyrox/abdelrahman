@@ -1,32 +1,33 @@
 "use strict";
 
-const assertResponseIsOk = async res => {
+const jsonHttp = require("./jsonHttp.jsx")
+
+async function assertResponseIsOk(res) {
   if (!res.ok) {
     const text = await res.text();
     throw Error(`${res.status} ${res.statusText}: ${text}`);
   }
-};
+}
 
-const getPublicKey = async () => {
-  const res = await fetch("/public-key");
-  await assertResponseIsOk(res);
-  const body = await res.json();
+
+async function getPublicKey() {
+  const body = await jsonHttp.get("/public-key");
   return body.key;
 };
 
-const addSubscription = async subscription => {
+async function addSubscription(subscription) {
   const encodedEndpoint = encodeURIComponent(subscription.endpoint);
   const url = `/order-subscriptions?endpoint=${encodedEndpoint}`;
 
   const asObject = JSON.parse(JSON.stringify(subscription));
   const body = JSON.stringify(asObject.keys);
-
-  const res = await fetch(url, {
-    method: "post",
-    headers: { "Content-Type": "application/json" },
-    body: body
-  });
-  await assertResponseIsOk(res);
+  
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: body
+    });
+    await assertResponseIsOk(res);
 };
 
 const removeSubscription = async endpoint => {

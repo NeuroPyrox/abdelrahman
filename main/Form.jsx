@@ -1,6 +1,5 @@
 "use strict";
 const React = require("react");
-const ReactDOM = require("react-dom");
 const Menu = require("./Menu.jsx");
 
 module.exports = class Form extends React.Component {

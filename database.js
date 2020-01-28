@@ -1,211 +1,165 @@
 "use strict";
 
-// TODO test if contactInfo can be stored and retrieved if it has unsafe characters
+const sqlite3Async = require("./sqlite3Async.js");
 
-const sqlite3 = require("sqlite3");
-const Joi = require("@hapi/joi");
+// Unsafe = vulnerable to SQL injection
 
-const database = new sqlite3.Database(".data/database.db");
+// TODO test if you can store strings with unsafe characters
 
-ensureTableExists("Prices", "numMeals INT, price INT");
-ensureTableExists("Subscriptions", "endpoint TEXT, p256dh TEXT, auth TEXT");
-ensureTableExists(
-  "Orders",
-  `timestamp INT,
-   butterChickenQuantity INT, 
-   butterChickenSpiceLevel TEXT,
-   sweetNSourQuantity INT,
-   delivery BOOL,
-   contactInfo TEXT`
-);
+// TODO move code
+
+// ensureTableExists("Prices", "numMeals INT, price INT");
+// ensureTableExists("Subscriptions", "endpoint TEXT, p256dh TEXT, auth TEXT");
+// ensureTableExists(
+//   "Orders",
+//   `timestamp INT,
+//    butterChickenQuantity INT,
+//    butterChickenSpiceLevel TEXT,
+//    sweetNSourQuantity INT,
+//    delivery BOOL,
+//    contactInfo TEXT`
+// );
 
 module.exports = {
-  getOrders: async function getOrders() {
-    return all("SELECT * FROM Orders");
-  },
+  ensureTableExists: ensureTableExists,
+  getTable: getTable,
+  setTable: setTable,
+  insert: insert,
+  remove: remove,
+  has: has
+}
 
-  addOrder: async function addOrder(order) {
-    validateOrder(order);
-    await run(
-      `INSERT INTO Orders (
-        timestamp, 
-        butterChickenQuantity, 
-        butterChickenSpiceLevel, 
-        sweetNSourQuantity, 
-        delivery, 
-        contactInfo) 
-      VALUES (?, ?, ?, ?, ?, ?)`,
-      [
-        Date.now(),
-        order.butterChickenQuantity,
-        order.butterChickenSpiceLevel,
-        order.sweetNSourQuantity,
-        order.delivery,
-        order.contactInfo
-      ]
-    );
-  },
+// Unsafe
+async function ensureTableExists(tableName, columns) {
+  const exists = await tableExists(tableName);
+  if (!exists) {
+    await createTable(tableName, columns);
+  }
+  // Reminder: if you find youself needing to check if the table has the right columns, you wrote poor code
+}
 
-  addSubscription: async function addSubscription(subscription) {
-    const { endpoint } = subscription;
-    const { p256dh, auth } = subscription.keys;
-    await run(
-      "INSERT INTO Subscriptions (endpoint, p256dh, auth) VALUES (?, ?, ?)",
-      [endpoint, p256dh, auth]
-    );
-  },
+// Unsafe
+async function getTable(tableName) {
+  const table = await sqlite3Async.all(`SELECT * FROM ${tableName}`);
+  return table;
+}
 
-  getSubscriptions: async function getSubscriptions() {
-    const rows = await all("SELECT endpoint, p256dh, auth FROM Subscriptions");
-    return rows.map(convertRowToSubscription);
-  },
-
-  hasSubscription: async function hasSubscription(endpoint) {
-    const selection = await get(
-      "SELECT 1 FROM Subscriptions WHERE endpoint=?",
-      endpoint
-    );
-    return selection !== undefined;
-  },
-
-  removeSubscription: async function removeSubscription(endpoint) {
-    await run("DELETE FROM Subscriptions WHERE endpoint=?", endpoint);
+// Unsafe: tableName, row keys
+async function setTable(tableName, rows) {
+  await sqlite3Async.run(`TRUNCATE TABLE ${tableName}`);
+  for (const row of rows) {
+    await insert(tableName, row);
   }
 }
 
-// Vulnerable to sql injection
-function ensureTableExists(name, columns) {
-  if (!tableExists(name)) {
-    createTable(name, columns);
-  }
+// Unsafe: tableName, row keys
+async function insert(tableName, row) {
+  const keys = Object.keys(row);
+  const columns = keys.join(", ");
+  const placeholders = new Array(keys.length).fill("?").join(", ");
+  await sqlite3Async.run(
+    `INSERT INTO ${tableName} (${columns}) VALUES (${placeholders}))`,
+    Object.values(row)
+  );
 }
 
-async function tableExists(name) {
-  const err = await getRejection(run(`SELECT 1 FROM ${name}`))
+// Unsafe: tableName, row keys
+async function remove(tableName, row) {
+  await sqlite3Async.run(
+    `DELETE FROM ${tableName} WHERE ${convertToConditions(row)}`,
+    Object.values(row)
+  );
+}
+
+// Unsafe: tableName, row keys
+async function has(tableName, row) {
+  const selection = await sqlite3Async.get(
+    `SELECT 1 FROM ${tableName} WHERE ${convertToConditions(row)}`,
+    Object.values(row)
+  );
+  return selection !== undefined;
+}
+
+////////////////////////////
+// Non-exported functions //
+////////////////////////////
+
+// Unsafe
+async function tableExists(tableName) {
+  const err = await getRejection(sqlite3Async.run(`SELECT 1 FROM ${tableName}`));
   if (err === null) {
     return true;
   }
-  if (err.message === `Error: SQLITE_ERROR: no such table: ${name}`) {
+  if (err.message === `Error: SQLITE_ERROR: no such table: ${tableName}`) {
     return false;
   }
   throw err;
 }
 
-// Vulnerable to sql injection
-async function createTable(name, columns) {
-  await run(`CREATE TABLE ${name} (${columns})`);
+// Unsafe
+async function createTable(tableName, columns) {
+  await sqlite3Async.run(`CREATE TABLE ${tableName} (${columns})`);
 }
 
-async function run(sql, params) {
-  const {promise, outerResolve} = createOuterResolve();
-  database.run(sql, params, outerResolve);
-  const [err] = await promise;
-  checkForError(err);
+// Unsafe: row keys
+function convertToConditions(row) {
+  return Object.keys(row)
+    .map(key => `${key}=?`)
+    .join(" ");
 }
-
-async function get(sql, params) {
-  const {promise, outerResolve} = createOuterResolve();
-  database.get(sql, params, outerResolve);
-  const [err, row] = await promise;
-  checkForError(err);
-  return row;
-}
-
-async function all(sql, params) {
-  const {promise, outerResolve} = createOuterResolve();
-  database.all(sql, params, outerResolve);
-  const [err, rows] = await promise;
-  checkForError(err);
-  return rows;
-}
-
-//////////////////////
-// Helper functions //
-//////////////////////
 
 async function getRejection(promise) {
   try {
     await promise;
-  } catch(err) {
+  } catch (err) {
     return err;
   }
   return null;
 }
 
-// Resolves its arguments in an array
-function createOuterResolve() {
-  let outerResolve;
-  const promise = new Promise(function(resolve, reject) {
-    outerResolve = function(...args) {
-      resolve(args)
-    }
-  })
-  return {promise: promise, outerResolve: outerResolve}
-}
+// TODO move code
 
-function checkForError(err) {
-  if (err !== null) {
-    throw Error(err)
-  }
-}
+// function convertRowToSubscription({ endpoint, p256dh, auth }) {
+//   return {
+//     endpoint: endpoint,
+//     keys: {
+//       p256dh: p256dh,
+//       auth: auth
+//     }
+//   };
+// }
 
-/////////////////////////
-// Non-exported functions
-/////////////////////////
+// const Joi = require("@hapi/joi");
+// const orderSchema = Joi.object().keys({
+//   butterChickenQuantity: Joi.number()
+//     .integer()
+//     .min(0)
+//     .required(),
+//   butterChickenSpiceLevel: Joi.string().valid("notSpicy", "mild", "hot"),
+//   sweetNSourQuantity: Joi.number()
+//     .integer()
+//     .min(0)
+//     .required(),
+//   delivery: Joi.boolean().required(),
+//   contactInfo: Joi.string().required()
+// });
 
-async function createOrderTable() {
-  await database.run(
-    `CREATE TABLE Orders (
-      timestamp INT,
-      butterChickenQuantity INT, 
-      butterChickenSpiceLevel TEXT,
-      sweetNSourQuantity INT,
-      delivery BOOL,
-      contactInfo TEXT
-    )`
-  );
-}
-
-function convertRowToSubscription({ endpoint, p256dh, auth }) {
-  return {
-    endpoint: endpoint,
-    keys: {
-      p256dh: p256dh,
-      auth: auth
-    }
-  };
-}
-
-const orderSchema = Joi.object().keys({
-  butterChickenQuantity: Joi.number()
-    .integer()
-    .min(0)
-    .required(),
-  butterChickenSpiceLevel: Joi.string().valid("notSpicy", "mild", "hot"),
-  sweetNSourQuantity: Joi.number()
-    .integer()
-    .min(0)
-    .required(),
-  delivery: Joi.boolean().required(),
-  contactInfo: Joi.string().required()
-});
-
-function validateOrder(order) {
-  const err = orderSchema.validate(order).error;
-  if (err !== undefined) {
-    throw Error(JSON.stringify(err, null, 2));
-  }
-  if (order.butterChickenQuantity === 0) {
-    if (order.butterChickenSpiceLevel !== null) {
-      throw Error(
-        "Expected butterChickenSpiceLevel to be null when butterChickenQuantity is 0"
-      );
-    }
-  } else {
-    if (!order.butterChickenSpiceLevel) {
-      throw Error(
-        "Expected butterChickenSpiceLevel when butterChickenQuantity is above 0"
-      );
-    }
-  }
-}
+// function validateOrder(order) {
+//   const err = orderSchema.validate(order).error;
+//   if (err !== undefined) {
+//     throw Error(JSON.stringify(err, null, 2));
+//   }
+//   if (order.butterChickenQuantity === 0) {
+//     if (order.butterChickenSpiceLevel !== null) {
+//       throw Error(
+//         "Expected butterChickenSpiceLevel to be null when butterChickenQuantity is 0"
+//       );
+//     }
+//   } else {
+//     if (!order.butterChickenSpiceLevel) {
+//       throw Error(
+//         "Expected butterChickenSpiceLevel when butterChickenQuantity is above 0"
+//       );
+//     }
+//   }
+// }

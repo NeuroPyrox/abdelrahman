@@ -1,17 +1,18 @@
+
 const React = require("react");
 const ReactDOM = require("react-dom");
 const api = require("./api.jsx");
-const { foundBug } = require("./helper.jsx");
+const foundBug = require("./foundBug.jsx");
 
 module.exports = class OrderTable extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       orders: []
     };
     api
       .getOrders()
-      .then(orders => this.setState({ orders: orders.reverse() }))
+      .then(orders => this.setState({ orders: orders }))
       .catch(foundBug);
   }
 
@@ -20,7 +21,7 @@ module.exports = class OrderTable extends React.Component {
       <table>
         <Header />
         <tbody>
-          {this.state.orders.map(function(order) {
+          {this.state.orders.reverse().map(function(order) {
             return <Row order={order} key={order.timestamp} />;
           })}
         </tbody>
