@@ -1,113 +1,95 @@
 "use strict";
 
-const resource = require("resource.js");
+const adminOnly = credentials => {
+  // TODO
+}
 
-initializeServer({
-  "/": staticFile("/main/main.html"),
-  "/admin/": redirect("/admin"),
-  "/admin": staticFile("/admin/admin.html"),
+const thenNotifyAdmin = data => {
+  // TODO
+}
 
-  "/main/bundle.js": staticFile("/main/bundle.js"),
-  "/admin/bundle.js": staticFile("/admin/bundle.js"),
+const applyMiddleware = (bareHandler, middlewareArray) => {
+  return middlewareArray.reduce(
+    (handler, middleware) => middleware(handler),
+    bareHandler
+  );
+};
 
-  "/public-vapid-key": staticJson({ key: process.env.PUBLIC_VAPID_KEY }),
 
-  "/prices": collection(prices),
-
-  "/prices": collection(prices, {
-    GET: [],
-    PUT: [adminOnly]
-  }),
-  "/orders": collection(orders, {
-    POST: [thenNotifyAdmin],
-    GET: [adminOnly]
-  }),
-  "/admin-push-subscriptions/:endpoint": collection(
-    ({ endpoint }) => adminPushSubscriptions.at(endpoint),
-    {
-      HEAD: [adminOnly],
-      PUT: [adminOnly],
-      DELETE: [adminOnly]
+const createDatabaseHandler = (database, method) => {
+  return {
+    get: async () => {
+      return database.getAll();
+    },
+    put: async rows => {
+      await database.setAll(rows);
+    },
+    post: async row => {
+      await database.insert(row);
     }
-  )
-});
+  }[method]
+}
 
-function initializeServer(resourcePaths) {
+const collection = (database, methods) => {
+  const handlers = {};
+  for (const [method, middlewareArray] of Object.entries(methods)) {
+    const bareHandler = createDatabaseHandler[method];
+    handlers[method] = applyMiddleware(bareHandler, middlewareArray);
+  }
+  return handlers
+};
+
+const convertHandlerToExpress = handler => {
+  // TODO
+}
+
+const assertIsHttpMethod = method => {
+  return ["head", "get", "put", "post", "delete"].contains(method);
+};
+
+const useResource = (app, path, resource) => {
+  for (const [method, handler] of resource) {
+    assertIsHttpMethod(method);
+    app[method](path, convertHandlerToExpress(handler));
+  }
+};
+
+const startServer = resourcePaths => {
   const express = require("express");
   const app = express();
+  app.enable("strict routing");
   for (const [path, resource] of Object.entries(resourcePaths)) {
-    //useResource(app, resource);
+    useResource(app, path, resource);
   }
   app.listen(process.env.PORT, () => {
     console.log(`Your app is listening on port ${process.env.PORT}`);
   });
-}
+};
 
+startServer({
+  "/": new StaticFile("/main/main.html"),
+  "/admin/": new Redirect("/admin"),
+  "/admin": new StaticFile("/admin/admin.html"),
 
-serveFile("/", "main/main.html");
-redirect("/admin", "/admin/");
-serveFile("/admin/", "admin/admin.html");
+  "/main/bundle.js": new StaticFile("/main/bundle.js"),
+  "/admin/bundle.js": new StaticFile("/admin/bundle.js"),
 
-serveFile("/main/bundle.js", "/main/bundle.js");
-serveFile("/admin/bundle.js", "/admin/bundle.js");
+  "/public-vapid-key": new StaticJson({ key: process.env.PUBLIC_VAPID_KEY }),
 
-
-function serveFile(to, from) {
-  router.get(to, function(req, res) {
-    res.sendFile(from);
-  });
-}
-
-function redirect(from, to) {
-  router.get(from, function(req, res) {
-    res.redirect(to);
-  });
-}
-
-///////////
-// Other //
-///////////
-
-app.get("/public-vapid-key", (req, res) => {
-  res.send({ key: process.env.PUBLIC_VAPID_KEY });
-});
-
-app.use(require("body-parser").json());
-
-// Admin Push Subscriptions
-
-app.use("/admin-push-subscriptions");
-
-app.post(
-  "/admin-push-subscriptions/insert",
-  makeMiddleware(adminPushSubscriptions.insert)
-);
-
-app.post(
-  "/admin-push-subscriptions/has",
-  makeMiddleware(adminPushSubscriptions.has)
-);
-
-app.post(
-  "/admin-push-subscriptions/remove",
-  makeMiddleware(adminPushSubscriptions.remove)
-);
-
-app.post("/prices/get-all", makeMiddleware(prices.getAll));
-
-app.post("/prices/set-all", makeMiddleware(prices.setAll));
-
-app.post("/orders/insert", makeMiddleware(orders.insert));
-
-app.post("/orders/get-all", makeMiddleware(orders.getAll));
-
-function makeMiddleware(action) {
-  return async function(req, res, next) {
-    try {
-      const result = await action(req.body);
-      res.send(result);
-    } catch (err) {
-      next(err);
+  "/prices": collection(prices, {
+    get: [],
+    put: [adminOnly]
+  }),
+  "/orders": collection(orders, {
+    post: [thenNotifyAdmin],
+    get: [adminOnly]
+  }),
+  "/admin-push-subscriptions/:endpoint": new Item(
+    ({ endpoint }) => adminPushSubscriptions.at(endpoint),
+    {
+      head: [adminOnly],
+      put: [adminOnly],
+      delete: [adminOnly]
     }
-  };
-}
+  )
+});
