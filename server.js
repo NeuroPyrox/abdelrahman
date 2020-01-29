@@ -2,11 +2,11 @@
 
 const adminOnly = credentials => {
   // TODO
-}
+};
 
 const thenNotifyAdmin = data => {
   // TODO
-}
+};
 
 const applyMiddleware = (bareHandler, middlewareArray) => {
   return middlewareArray.reduce(
@@ -15,81 +15,61 @@ const applyMiddleware = (bareHandler, middlewareArray) => {
   );
 };
 
-
-const createDatabaseHandler = (database, method) => {
-  return {
-    get: async () => {
-      return database.getAll();
-    },
-    put: async rows => {
-      await database.setAll(rows);
-    },
-    post: async row => {
-      await database.insert(row);
-    }
-  }[method]
-}
-
-const collection = (database, methods) => {
-  const handlers = {};
-  for (const [method, middlewareArray] of Object.entries(methods)) {
-    const bareHandler = createDatabaseHandler[method];
-    handlers[method] = applyMiddleware(bareHandler, middlewareArray);
-  }
-  return handlers
-};
-
-const convertHandlerToExpress = handler => {
-  // TODO
-}
+const services = require("./services.js")
 
 const assertIsHttpMethod = method => {
   return ["head", "get", "put", "post", "delete"].contains(method);
 };
 
-const useResource = (app, path, resource) => {
-  for (const [method, handler] of resource) {
+const useService = (server, path, service) => {
+  for (const [method, handler] of service) {
     assertIsHttpMethod(method);
-    app[method](path, convertHandlerToExpress(handler));
+    server[method](path, handler);
   }
 };
 
-const startServer = resourcePaths => {
-  const express = require("express");
-  const app = express();
-  app.enable("strict routing");
-  for (const [path, resource] of Object.entries(resourcePaths)) {
-    useResource(app, path, resource);
+const useServices = (server, services) => {
+  for (const [path, service] of Object.entries(services)) {
+    useService(server, path, service);
   }
-  app.listen(process.env.PORT, () => {
+};
+
+const createBareServer = () => {
+  const server = require("express")();
+  server.enable("strict routing");
+  server.use(require("body-parser").json());
+  return server;
+}
+
+const startServer = services => {
+  const server = createBareServer();
+  useServices(server, services);
+  server.listen(process.env.PORT, () => {
     console.log(`Your app is listening on port ${process.env.PORT}`);
   });
 };
 
 startServer({
-  "/": new StaticFile("/main/main.html"),
-  "/admin/": new Redirect("/admin"),
-  "/admin": new StaticFile("/admin/admin.html"),
+  "/": services.staticFile("/main/main.html"),
+  "/admin/": services.redirect("/admin"),
+  "/admin": services.staticFile("/admin/admin.html"),
 
-  "/main/bundle.js": new StaticFile("/main/bundle.js"),
-  "/admin/bundle.js": new StaticFile("/admin/bundle.js"),
+  "/main/bundle.js": services.staticFile("/main/bundle.js"),
+  "/admin/bundle.js": services.staticFile("/admin/bundle.js"),
 
-  "/public-vapid-key": new StaticJson({ key: process.env.PUBLIC_VAPID_KEY }),
+  "/public-vapid-key": services.staticJson({ key: process.env.PUBLIC_VAPID_KEY }),
 
-  "/prices": collection(prices, {
+  "/prices": services.table(prices, {
     get: [],
     put: [adminOnly]
   }),
-  "/orders": collection(orders, {
+  "/orders": services.table(orders, {
     post: [thenNotifyAdmin],
     get: [adminOnly]
   }),
-  "/admin-push-subscriptions/:endpoint": new Item(
-    ({ endpoint }) => adminPushSubscriptions.at(endpoint),
-    {
-      head: [adminOnly],
-      put: [adminOnly],
-      delete: [adminOnly]
-    }
-  )
+  "/admin-push-subscriptions/:endpoint": services.tableRow(adminPushSubscriptions, {
+    head: [adminOnly, testForExistance],
+    put: [adminOnly],
+    delete: [adminOnly]
+  })
 });
