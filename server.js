@@ -1,21 +1,19 @@
 "use strict";
 
-const adminOnly = credentials => {
-  // TODO
-};
+const sendResult = (res, result) => {
+  
+}
 
-const thenNotifyAdmin = data => {
-  // TODO
+const convertHandlerToExpress = handler => {
+  return async (req, res, next) => {
+    try {
+      const result = await handler(req.params, req.body);
+      sendResult(res, result);
+    } catch(err) {
+      next(err)
+    }
+  }
 };
-
-const applyMiddleware = (bareHandler, middlewareArray) => {
-  return middlewareArray.reduce(
-    (handler, middleware) => middleware(handler),
-    bareHandler
-  );
-};
-
-const services = require("./services.js")
 
 const assertIsHttpMethod = method => {
   return ["head", "get", "put", "post", "delete"].contains(method);
@@ -24,7 +22,7 @@ const assertIsHttpMethod = method => {
 const useService = (server, path, service) => {
   for (const [method, handler] of service) {
     assertIsHttpMethod(method);
-    server[method](path, handler);
+    server[method](path, convertHandlerToExpress(handler));
   }
 };
 
@@ -49,6 +47,18 @@ const startServer = services => {
   });
 };
 
+const createHandler = (getResource) => {
+  const handle = async (req, res, next) => {
+    try {
+      const resource = await getResource(req.params)
+    } catch(err) {
+      next(err)
+    }
+  }
+}
+
+const services = require("./services.js")
+
 startServer({
   "/": services.staticFile("/main/main.html"),
   "/admin/": services.redirect("/admin"),
@@ -68,7 +78,7 @@ startServer({
     get: [adminOnly]
   }),
   "/admin-push-subscriptions/:endpoint": services.tableRow(adminPushSubscriptions, {
-    head: [adminOnly, testForExistance],
+    head: [adminOnly],
     put: [adminOnly],
     delete: [adminOnly]
   })
