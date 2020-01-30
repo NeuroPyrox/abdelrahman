@@ -1,24 +1,34 @@
 "use strict";
 
-const file = path => {
-  return req => req.sendFile(path)
+class Response {
+  constructor(responder) {
+    this.responder = responder;
+  }
+
+  dump(res) {
+    this.responder(res);
+  }
 }
+
+const file = path => {
+  return new Response(req => req.sendFile(path));
+};
 
 const redirect = path => {
-  return req => req.redirect(path)
-}
+  return new Response(req => req.redirect(path));
+};
 
 const json = object => {
-  return req => req.send(object)
-}
+  return new Response(req => req.send(object));
+};
 
 const status = code => {
-  return req => req.sendStatus(code)
-}
+  return new Response(req => req.sendStatus(code));
+};
 
 module.exports = {
   file: file,
   redirect: redirect,
   json: json,
   status: status
-}
+};
