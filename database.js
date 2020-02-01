@@ -6,17 +6,6 @@ const sqlite3Async = require("./sqlite3Async.js");
 
 // TODO test if you can store strings with unsafe characters
 
-// TODO move code
-
-module.exports = {
-  ensureTableExists: ensureTableExists,
-  getTable: getTable,
-  setTable: setTable,
-  insert: insert,
-  remove: remove,
-  has: has
-}
-
 // Unsafe
 async function ensureTableExists(tableName, columns) {
   const exists = await tableExists(tableName);
@@ -105,49 +94,13 @@ async function getRejection(promise) {
   return null;
 }
 
-// TODO move code
+class Table {
+  constructor(name, columns) {
+    this.name = name;
+    this.columns = columns;
+  }
+}
 
-// function convertRowToSubscription({ endpoint, p256dh, auth }) {
-//   return {
-//     endpoint: endpoint,
-//     keys: {
-//       p256dh: p256dh,
-//       auth: auth
-//     }
-//   };
-// }
-
-// const Joi = require("@hapi/joi");
-// const orderSchema = Joi.object().keys({
-//   butterChickenQuantity: Joi.number()
-//     .integer()
-//     .min(0)
-//     .required(),
-//   butterChickenSpiceLevel: Joi.string().valid("notSpicy", "mild", "hot"),
-//   sweetNSourQuantity: Joi.number()
-//     .integer()
-//     .min(0)
-//     .required(),
-//   delivery: Joi.boolean().required(),
-//   contactInfo: Joi.string().required()
-// });
-
-// function validateOrder(order) {
-//   const err = orderSchema.validate(order).error;
-//   if (err !== undefined) {
-//     throw Error(JSON.stringify(err, null, 2));
-//   }
-//   if (order.butterChickenQuantity === 0) {
-//     if (order.butterChickenSpiceLevel !== null) {
-//       throw Error(
-//         "Expected butterChickenSpiceLevel to be null when butterChickenQuantity is 0"
-//       );
-//     }
-//   } else {
-//     if (!order.butterChickenSpiceLevel) {
-//       throw Error(
-//         "Expected butterChickenSpiceLevel when butterChickenQuantity is above 0"
-//       );
-//     }
-//   }
-// }
+module.exports = {
+  Table: Table
+}

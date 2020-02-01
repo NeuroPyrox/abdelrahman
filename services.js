@@ -3,25 +3,22 @@
 // IDEA move the non-exported parts to their own module to separate abstraction from implementation
 
 const {
+  assert,
   combineEntries,
   wrapIfNotArray,
   mapValues,
-  mapValuesWithKeys
-} = require("./helper.js");
-const resources = require("./resources.js");
+  mapValuesWithKeys,
+  asyncHandler
+} = require("./helpers.js");
 const express = require("express");
 
-// TODO make this function more expressive
 const insertMainHandlers = (middleware, mainHandlers) => {
-  const handlers = [];
-  for (const handler of middleware) {
-    // WARNING this is a magic value. Maybe make it a constant
-    if (handler === "main") {
-      handlers = handlers.concat(mainHandlers);
-    } else {
-      handlers.push(handler);
-    }
-  }
+  // WARNING "main" is a magic value. Maybe make it a constant
+  const mainIndex = middleware.indexOf("main");
+  assert(mainIndex !== -1)
+  const start = middleware.slice(0, mainIndex)
+  const end = middleware.slice(mainIndex+1)
+  return start.concat(mainHandlers, end)
 };
 
 class Service {
@@ -50,20 +47,8 @@ class Service {
   }
 }
 
-const wrapAsyncHandler = handler => {
-  return async (req, res, next) => {
-    try {
-      await handler(req, res);
-    } catch (err) {
-      next(err);
-      return;
-    }
-    next();
-  };
-};
-
 const asyncService = handlers => {
-  return new Service(mapValues(handlers, wrapAsyncHandler));
+  return new Service(mapValues(handlers, asyncHandler));
 };
 
 /////////////
@@ -73,7 +58,7 @@ const asyncService = handlers => {
 const staticFile = path => {
   return new Service({
     get: (req, res) => {
-      res.sendFile(path);
+      res.sendFile(__dirname + path);
     }
   });
 };

@@ -4,6 +4,10 @@ const assert = (condition, message = "") => {
   }
 };
 
+const hasKey = (object, key) => {
+  return object[key] !== undefined
+}
+
 const countKeys = object => {
   return Object.keys(object).length;
 };
@@ -53,11 +57,26 @@ const mapValuesWithKeys = (object, valueMapperWithKeys) => {
   return mapped;
 };
 
+const asyncHandler = unwrapped => {
+  return async (req, res, next) => {
+    try {
+      await unwrapped(req, res);
+    } catch(err) {
+      next(err)
+      return
+    }
+    next();
+  }
+}
+
 module.exports = {
   assert: assert,
+  hasKey: hasKey,
   countKeys: countKeys,
   countCombinedKeys: countCombinedKeys,
   combineEntries: combineEntries,
   wrapIfNotArray: wrapIfNotArray,
-  mapValues: mapValues
+  mapValues: mapValues,
+  mapValuesWithKeys,
+  asyncHandler: asyncHandler
 };

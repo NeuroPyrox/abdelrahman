@@ -1,9 +1,12 @@
 "use strict";
 
+const {asyncHandler} = require("./helpers.js")
 const database = require("./database.js")
 const startServer = require("./startServer.js");
 const services = require("./services.js");
-const mw = require("./middleware.js");
+const bodyParser = require("body-parser");
+
+const jsonParser = bodyParser.json()
 
 const prices = new database.Table(
   "Prices",
@@ -23,6 +26,23 @@ const orders = new database.Table(
    contactInfo TEXT`
 );
 
+// TODO this is the sloppiest authentication I can possibly think of. Revise it.
+const adminOnly = (req, res, next) => {
+  if (req.get("Authorization") !== "insecurePassword") {
+    res.sendStatus(403)
+  } else {
+    next()
+  }
+}
+
+const notifyAdmin = asyncHandler(async (req, res) => {
+  const rows = await adminPushSubscriptions();
+  const promises = rows
+        .map(push.unflattenSubscription)
+        .map(subscription => push.send(subscription, JSON.stringify(req.body)))
+  await Promise.all(promises)
+});
+
 // Use helper functions to interface with Expressjs
 // because otherwise, the middleware would make it unacceptably verbose
 startServer({
@@ -41,12 +61,12 @@ startServer({
 
   "/prices": services.table(prices).route({
     get: ["main"],
-    put: [mw.adminOnly, "main"]
+    put: [adminOnly, jsonParser, "main"]
   }),
   "/orders": services.table(orders).route({
-    post: ["main", mw.notifyAdmin],
-    get: [mw.adminOnly, "main"]
+    post: [jsonParser, "main", notifyAdmin],
+    get: [adminOnly, "main"]
   }),
   "/admin-push-subscriptions/:endpoint": services.tableRow(adminPushSubscriptions)
-    .routeAll([mw.adminOnly, "main"])
+    .routeAll([adminOnly, jsonParser, "main"])
 });
