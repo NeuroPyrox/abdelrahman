@@ -8,18 +8,6 @@ const sqlite3Async = require("./sqlite3Async.js");
 
 // TODO move code
 
-// ensureTableExists("Prices", "numMeals INT, price INT");
-// ensureTableExists("Subscriptions", "endpoint TEXT, p256dh TEXT, auth TEXT");
-// ensureTableExists(
-//   "Orders",
-//   `timestamp INT,
-//    butterChickenQuantity INT,
-//    butterChickenSpiceLevel TEXT,
-//    sweetNSourQuantity INT,
-//    delivery BOOL,
-//    contactInfo TEXT`
-// );
-
 module.exports = {
   ensureTableExists: ensureTableExists,
   getTable: getTable,

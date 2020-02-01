@@ -1,5 +1,4 @@
-
-const assert = (condition, message="") => {
+const assert = (condition, message = "") => {
   if (!condition) {
     throw Error(message);
   }
@@ -30,9 +29,35 @@ const combineEntries = objects => {
   );
 };
 
+const wrapIfNotArray = object => {
+  if (Array.isArray(object)) {
+    return object;
+  } else {
+    return [object];
+  }
+};
+
+const mapValues = (object, valueMapper) => {
+  const mapped = {};
+  for (const [key, value] of Object.entries(object)) {
+    mapped[key] = valueMapper(value);
+  }
+  return mapped;
+};
+
+const mapValuesWithKeys = (object, valueMapperWithKeys) => {
+  const mapped = {};
+  for (const [key, value] of Object.entries(object)) {
+    mapped[key] = valueMapperWithKeys(key, value);
+  }
+  return mapped;
+};
+
 module.exports = {
   assert: assert,
   countKeys: countKeys,
   countCombinedKeys: countCombinedKeys,
-  combineEntries: combineEntries
-}
+  combineEntries: combineEntries,
+  wrapIfNotArray: wrapIfNotArray,
+  mapValues: mapValues
+};
