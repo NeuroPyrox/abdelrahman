@@ -51,13 +51,13 @@ startServer({
   "/admin": services.staticFile("/admin/admin.html"),
 
   "/main/bundle.js": services.staticFile("/main/bundle.js"),
+  "/main/style.css": services.staticFile("/main/style.css"),
   "/admin/bundle.js": services.staticFile("/admin/bundle.js"),
+  "/admin/style.css": services.staticFile("/admin/style.css"),
 
   "/public-vapid-key": services.staticJson({
     key: process.env.PUBLIC_VAPID_KEY
   }),
-
-  "/admin-push-subscriptions/:endpoint": {},
 
   "/prices": services.table(prices).route({
     get: ["main"],

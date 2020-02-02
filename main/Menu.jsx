@@ -1,6 +1,7 @@
 "use strict";
 
 const React = require("react");
+const QuantityInput = require("./QuantityInput.jsx")
 
 module.exports = class Menu extends React.Component {
   constructor(props) {
@@ -60,7 +61,7 @@ function MenuOption({ onInput, name, text, image }) {
     <div style={{ flexDirection: "column" }}>
       <img src={image} />
       {text}
-      <input type="number" min="0" name={name} onInput={onInput} required />
+      <QuantityInput />
     </div>
   );
 }

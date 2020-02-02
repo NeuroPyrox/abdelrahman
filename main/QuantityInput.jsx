@@ -2,6 +2,19 @@
 
 const React = require("react");
 
+const Plus = props => (
+  <div>
+    <div className="verticalLine"/>
+    <div className="horizontalLine"/>
+  </div>
+);
+
+const Minus = props => (
+  <div>
+    <div className="horizontalLine"/>
+  </div>
+);
+
 const digitsOnly = value => {
   return value.replace(/[^0-9]/, "");
 };
@@ -49,14 +62,17 @@ class QuantityInput extends React.Component {
 
   render() {
     return (
-      <div>
-        <button onClick={() => this.decrement()}>-</button>
+      <div className="quantityInput">
+        <button onClick={() => this.decrement()}>
+          <Minus />
+        </button>
         <input
-          style={{ textAlign: "center" }}
           value={format(this.state.quantity)}
           onChange={e => this.setQuantity(parse(e.target.value))}
         />
-        <button onClick={() => this.increment()}>+</button>
+        <button onClick={() => this.increment()}>
+          <Plus />
+        </button>
       </div>
     );
   }

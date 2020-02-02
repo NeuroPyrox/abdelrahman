@@ -8,7 +8,6 @@ const QuantityInput = require("./QuantityInput.jsx")
 
 ReactDOM.render(
   <div>
-    <QuantityInput />
     <h1>Abdelrahman's Food</h1>
     <Form />
   </div>,
