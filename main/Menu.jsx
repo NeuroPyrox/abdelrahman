@@ -1,5 +1,7 @@
 "use strict";
 
+// TODO delete this file
+
 const React = require("react");
 const QuantityInput = require("./QuantityInput.jsx")
 

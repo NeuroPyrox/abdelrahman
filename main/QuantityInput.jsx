@@ -9,6 +9,7 @@ const Plus = props => (
   </div>
 );
 
+// Must be inside a div to keep the css selectors consistent with Plus
 const Minus = props => (
   <div>
     <div className="horizontalLine"/>

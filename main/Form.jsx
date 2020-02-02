@@ -2,6 +2,8 @@
 const React = require("react");
 const Menu = require("./Menu.jsx");
 
+// TODO delete this file
+
 module.exports = class Form extends React.Component {
   constructor(props) {
     super(props);
