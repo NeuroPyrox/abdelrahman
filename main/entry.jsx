@@ -23,8 +23,26 @@ ReactDOM.render(
         name="Butter Chicken"
       />
     </div>
-    <h1>Abdelrahman's Food</h1>
-    <Form />
+    <div>
+      <h4>Sweet 'n Sour Chicken</h4>
+      <div className="spiceRadio">
+        <input type="radio" name="snsSpice" value="notSpicy" id="snsNotSpicy" />
+        <label for="snsNotSpicy">Not Spicy</label>
+        <input type="radio" name="snsSpice" value="mild" id="snsMild" />
+        <label for="snsMild">Mild</label>
+        <input type="radio" name="snsSpice" value="hot" id="snsHot" />
+        <label for="snsHot">Hot</label>
+      </div>
+      <h4>Butter Chicken</h4>
+      <div className="spiceRadio">
+        <input type="radio" name="bcSpice" value="notSpicy" id="bcNotSpicy" />
+        <label for="bcNotSpicy">Not Spicy</label>
+        <input type="radio" name="bcSpice" value="mild" id="bcMild" />
+        <label for="bcMild">Mild</label>
+        <input type="radio" name="bcSpice" value="hot" id="bcHot" />
+        <label for="bcHot">Hot</label>
+      </div>
+    </div>
   </div>,
   document.getElementById("main")
 );

@@ -1,14 +1,17 @@
 
+body {
+  font-family: 'Merienda';
+}
+
 .quantityInput {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 150px;
 }
 
 .quantityInput > input {
   text-align: center;
-  border-radius: 10px;
+  border-radius: 15px;
   border: 1px solid lightgray;
   height: 20px;
   width: 30px;
@@ -19,7 +22,7 @@
   align-items: center;
   justify-content: center;
   background-color: white;
-  border: 1px solid black;
+  border: 0;
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -62,26 +65,77 @@
 }
 
 .dish {
-  border-radius: 10px;
+  background-color: white;
+  border: 5px solid white;
+  border-radius: 20px;
   padding: 10px;
   margin: 5px;
   width: 200px;
-  text-align: center;
-  font-family: 'Merienda';
+  cursor: pointer;
 }
 
 .dish:hover {
-  background-color: lightgray;
+  border: 5px solid lightgray;
 }
 
-.dish > div {
+.dish > div:first-child {
   display: flex;
   justify-content: center;
   overflow: hidden;
-  border-radius: 10px;
+  border-radius: 15px;
   height: 150px;
 }
 
 .dish > div > img {
   height: 100%;
+}
+
+.dish > h3 {
+  text-align: center;
+  margin: 10px;
+  margin-bottom: 0px;
+}
+
+.selectedDish {
+  background-color: lightgray;
+  border: 5px solid lightgray;
+}
+
+.selectedDish:hover {
+  border: 5px solid white;
+}
+
+.spiceRadio > input {
+  display: none;
+}
+
+.spiceRadio > label {
+  background-color: white;
+  border: 5px solid white;
+  border-radius: 15px;
+  padding: 3px;
+  margin: 3px;
+  cursor: pointer;
+}
+
+.spiceRadio > input[value="notSpicy"] + label {
+  --spiceColor: lightgreen;
+}
+
+.spiceRadio > input[value="mild"] + label {
+  --spiceColor: khaki;
+}
+
+.spiceRadio > input[value="hot"] + label {
+  --spiceColor: lightsalmon;
+}
+
+.spiceRadio > label:hover {
+  border: 5px solid var(--spiceColor);
+}
+
+.spiceRadio > input:checked + label {
+  background-color: var(--spiceColor);
+  border: 5px solid var(--spiceColor);
+  cursor: default;
 }
