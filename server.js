@@ -8,6 +8,10 @@ const bodyParser = require("body-parser");
 
 const jsonParser = bodyParser.json()
 
+const menu = new database.Table(
+  "Menu",
+  "dish TEXT, imageUrl TEXT, isSpicy BOOL"
+)
 const prices = new database.Table(
   "Prices",
   "numMeals INT, price INT"
@@ -59,6 +63,10 @@ startServer({
     key: process.env.PUBLIC_VAPID_KEY
   }),
 
+  "/menu": services.table(menu).route({
+    get: ["main"],
+    put: [adminOnly, jsonParser, "main"]
+  }),
   "/prices": services.table(prices).route({
     get: ["main"],
     put: [adminOnly, jsonParser, "main"]

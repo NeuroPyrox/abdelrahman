@@ -1,0 +1,35 @@
+.plusButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  background-color: white;
+  border: 2px solid white;
+  border-radius: 50%;
+  height: 16px;
+  width: 16px;
+}
+
+.plusButton::-moz-focus-inner {
+  border: 0;
+}
+
+.plusButtonHover {
+  border-color: lightgray;
+}
+
+.plusButtonClick {
+  background-color: lightgray;
+  border-color: lightgray;
+}
+
+.plusButton > div {
+  position: absolute;
+  background-color: gray;
+  height: 2px;
+  width: 12px;
+}
+
+.plusButton > div:first-child {
+  transform: rotate(90deg);
+}

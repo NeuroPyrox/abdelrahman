@@ -5,7 +5,7 @@ const ReactDOM = require("react-dom");
 const React = require("react");
 const QuantityInput = require("./QuantityInput.jsx");
 const Dish = require("./Dish.jsx");
-const XButton = require("./XButton.jsx");
+const XButton = require("../components/xButton.jsx");
 
 ReactDOM.render(
   <div>

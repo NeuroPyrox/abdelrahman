@@ -6,6 +6,8 @@
     "webpack": "^4.41.4",
     "webpack-cli": "^3.3.10",
     "jsx-loader": "^0.13.2",
+    "style-loader": "^1.1.2",
+    "css-loader": "^3.4.1",
     "express": "^4.17.1",
     "sqlite3": "^4.1.1",
     "web-push": "^3.4.3",

@@ -2,6 +2,8 @@
 
 const React = require("react");
 
+// This custom button component prevents the button's children from moving when it's clicked
+// and fixes an issue with css :active
 class Button extends React.Component {
   constructor(props) {
     super(props);
@@ -29,7 +31,7 @@ class Button extends React.Component {
         className={this.getStyle()}
         onMouseDown={() => this.setState({clicking: true})}
         onMouseUp={() => this.setState({clicking: false})}
-        onMouseEnter={() => {this.setState({hovering: true})}}
+        onMouseEnter={() => this.setState({hovering: true})}
         onMouseLeave={() => this.setState({hovering: false, clicking: false})}
         onClick={this.props.onClick}
       >

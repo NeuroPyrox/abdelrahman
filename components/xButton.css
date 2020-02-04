@@ -1,0 +1,39 @@
+.xButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  background-color: white;
+  border: 2px solid white;
+  border-radius: 50%;
+  height: 16px;
+  width: 16px;
+}
+
+.xButton::-moz-focus-inner {
+  border: 0;
+}
+
+.xButtonHover {
+  border-color: lightgray;
+}
+
+.xButtonClick {
+  background-color: lightgray;
+  border-color: lightgray;
+}
+
+.xButton > div {
+  position: absolute;
+  background-color: gray;
+  height: 2px;
+  width: 12px;
+}
+
+.xButton > div:first-child {
+  transform: rotate(45deg);
+}
+
+.xButton > div:last-child {
+  transform: rotate(135deg);
+}

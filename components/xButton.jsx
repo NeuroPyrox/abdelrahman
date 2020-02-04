@@ -1,9 +1,10 @@
 "use strict";
 
 const React = require("react");
-const Button = require("./Button.jsx");
+const Button = require("./button.jsx");
+require("./xButton.css");
 
-const XButton = props => (
+const xButton = props => (
   <Button
     clickStyle="xButton xButtonClick"
     hoverStyle="xButton xButtonHover"
@@ -15,4 +16,4 @@ const XButton = props => (
   </Button>
 );
 
-module.exports = XButton;
+module.exports = xButton;
