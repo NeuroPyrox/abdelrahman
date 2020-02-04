@@ -65,8 +65,6 @@ body {
 }
 
 .dish {
-  background-color: white;
-  border: 5px solid white;
   border-radius: 20px;
   padding: 10px;
   margin: 5px;
@@ -74,8 +72,23 @@ body {
   cursor: pointer;
 }
 
-.dish:hover {
+/* At any given time, exactly one of .dishUnselected, .dishHalfSelected, or .dishSelected
+must be active in a given dish element */
+
+.dishUnselected {
+  border: 5px solid white;
+  background-color: white;
+}
+
+/* Use this instead of .dish:hover to keep the code explicit by avoiding weird specificity rules */
+.dishHalfSelected {
   border: 5px solid lightgray;
+  background-color: white;
+}
+
+.dishSelected {
+  border: 5px solid lightgray;
+  background-color: lightgray;
 }
 
 .dish > div:first-child {
@@ -94,15 +107,6 @@ body {
   text-align: center;
   margin: 10px;
   margin-bottom: 0px;
-}
-
-.selectedDish {
-  background-color: lightgray;
-  border: 5px solid lightgray;
-}
-
-.selectedDish:hover {
-  border: 5px solid white;
 }
 
 .spiceRadio > input {
