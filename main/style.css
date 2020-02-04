@@ -160,11 +160,11 @@ must be active in a given dish element */
   border: 0;
 }
 
-.xButton:hover {
+.xButtonHover {
   border-color: lightgray;
 }
 
-.xButton:active {
+.xButtonClick {
   background-color: lightgray;
   border-color: lightgray;
 }

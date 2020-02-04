@@ -1,12 +1,18 @@
 "use strict";
 
 const React = require("react");
+const Button = require("./Button.jsx");
 
 const XButton = props => (
-  <button className="xButton">
+  <Button
+    clickStyle="xButton xButtonClick"
+    hoverStyle="xButton xButtonHover"
+    defaultStyle="xButton"
+    onClick={props.onClick}
+  >
     <div />
     <div />
-  </button>
+  </Button>
 );
 
 module.exports = XButton;
