@@ -3,12 +3,22 @@
 const React = require("react");
 const XButton = require("../components/xButton.jsx");
 const PlusButton = require("../components/plusButton.jsx");
+const api = require("./api.jsx");
+const foundBug = require("./foundBug.jsx");
 
 const replaceField = (object, key, value) => {
   const copy = Object.assign({}, object);
   copy[key] = value;
   return copy;
 };
+
+const renameKey = (object, oldKey, newKey) => {
+  const copy = Object.assign({}, object);
+  const value = copy[oldKey];
+  delete copy[oldKey];
+  copy[newKey] = value;
+  return copy;
+}
 
 const replaceIndex = (array, i, value) => {
   const copy = array.slice();
@@ -106,6 +116,12 @@ class MenuTable extends React.Component {
     this.setState({ rows: pushArray(this.state.rows, newRow) });
   }
 
+  getTable() {
+    return this.state.rows
+      .map(row => renameKey(row.dish, "name", "dish"))
+      .filter(dish => dish.name !== "");
+  }
+
   render() {
     return (
       <table>
@@ -130,6 +146,13 @@ class MenuTable extends React.Component {
           <tr>
             <td>
               <PlusButton onClick={() => this.addRow()} />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <button onClick={() => api.saveMenu(this.getTable()).catch(foundBug)}>
+                Save Changes
+              </button>
             </td>
           </tr>
         </tfoot>

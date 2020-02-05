@@ -79,23 +79,27 @@ const redirect = path => {
   });
 };
 
+// TODO protect against SQL injection and erroneous input
 const table = databaseTable => {
   return asyncService({
     get: async (req, res) => {
-      const rows = await table.getAll();
+      const rows = await databaseTable.getAll();
       res.send(rows);
     },
 
     put: async (req, res) => {
-      await table.setAll(req.body);
+      await databaseTable.setAll(req.body);
+      res.end();
     },
 
     post: async (req, res) => {
-      await table.insert(req.body);
+      await databaseTable.insert(req.body);
+      res.end();
     }
   });
 };
 
+// TODO protect against SQL injection and erroneous input
 const tableRow = table => {
   return asyncService({
     head: async (req, res) => {
@@ -103,15 +107,18 @@ const tableRow = table => {
       if (!exists) {
         return res.sendStatus(404);
       }
+      res.end();
     },
 
     put: async (req, res) => {
       const row = combineEntries([req.params, req.body]);
       await table.insert(row);
+      res.end();
     },
 
     delete: async (req, res) => {
       await table.remove(req.params);
+      res.end();
     }
   });
 };

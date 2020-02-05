@@ -58,8 +58,20 @@ const getOrders = async () => {
   return res.json();
 };
 
-exports.getPublicKey = getPublicKey;
-exports.addSubscription = addSubscription;
-exports.removeSubscription = removeSubscription;
-exports.hasSubscription = hasSubscription;
-exports.getOrders = getOrders;
+const saveMenu = async menu => {
+  const res = await fetch("/menu", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", "Authorization": "insecurePassword" },
+    body: JSON.stringify(menu)
+  });
+  await assertResponseIsOk(res);
+};
+
+module.exports = {
+  getPublicKey: getPublicKey,
+  addSubscription: addSubscription,
+  removeSubscription: removeSubscription,
+  hasSubscription: hasSubscription,
+  getOrders: getOrders,
+  saveMenu: saveMenu
+}

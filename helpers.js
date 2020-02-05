@@ -63,9 +63,7 @@ const asyncHandler = unwrapped => {
       await unwrapped(req, res);
     } catch(err) {
       next(err)
-      return
     }
-    next();
   }
 }
 

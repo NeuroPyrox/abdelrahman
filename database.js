@@ -6,38 +6,12 @@ const sqlite3Async = require("./sqlite3Async.js");
 
 // TODO test if you can store strings with unsafe characters
 
-// Unsafe
-async function ensureTableExists(tableName, columns) {
-  const exists = await tableExists(tableName);
-  if (!exists) {
-    await createTable(tableName, columns);
-  }
-  // Reminder: if you find youself needing to check if the table has the right columns, you wrote poor code
-}
-
+// TODO move this into the Table class once necessary
+/////////////////
 // Unsafe
 async function getTable(tableName) {
   const table = await sqlite3Async.all(`SELECT * FROM ${tableName}`);
   return table;
-}
-
-// Unsafe: tableName, row keys
-async function setTable(tableName, rows) {
-  await sqlite3Async.run(`TRUNCATE TABLE ${tableName}`);
-  for (const row of rows) {
-    await insert(tableName, row);
-  }
-}
-
-// Unsafe: tableName, row keys
-async function insert(tableName, row) {
-  const keys = Object.keys(row);
-  const columns = keys.join(", ");
-  const placeholders = new Array(keys.length).fill("?").join(", ");
-  await sqlite3Async.run(
-    `INSERT INTO ${tableName} (${columns}) VALUES (${placeholders}))`,
-    Object.values(row)
-  );
 }
 
 // Unsafe: tableName, row keys
@@ -56,27 +30,7 @@ async function has(tableName, row) {
   );
   return selection !== undefined;
 }
-
-////////////////////////////
-// Non-exported functions //
-////////////////////////////
-
-// Unsafe
-async function tableExists(tableName) {
-  const err = await getRejection(sqlite3Async.run(`SELECT 1 FROM ${tableName}`));
-  if (err === null) {
-    return true;
-  }
-  if (err.message === `Error: SQLITE_ERROR: no such table: ${tableName}`) {
-    return false;
-  }
-  throw err;
-}
-
-// Unsafe
-async function createTable(tableName, columns) {
-  await sqlite3Async.run(`CREATE TABLE ${tableName} (${columns})`);
-}
+/////////////////
 
 // Unsafe: row keys
 function convertToConditions(row) {
@@ -94,10 +48,65 @@ async function getRejection(promise) {
   return null;
 }
 
+// TODO validate input here instead of delegating that task to the function callers
+// TODO make async operations robust against race conditions
 class Table {
   constructor(name, columns) {
     this.name = name;
     this.columns = columns;
+    // TODO force the constructor caller to await this
+    this.ensureExists();
+  }
+  
+  // Unsafe: row keys
+  async setAll(rows) {
+    await this.reset();
+    for (const row of rows) {
+      await this.insert(row);
+    }
+  }
+  
+  // Unsafe: row keys
+  async insert(row) {
+    const keys = Object.keys(row);
+    const columns = keys.join(", ");
+    const placeholders = new Array(keys.length).fill("?").join(", ");
+    await sqlite3Async.run(
+      `INSERT INTO ${this.name} (${columns}) VALUES (${placeholders})`,
+      Object.values(row)
+    );
+  }
+  
+  async ensureExists() {
+    const exists = await this.exists();
+    if (!exists) {
+      await this.create();
+    }
+    // Reminder: if you find youself needing to check if the table has the right columns, you wrote poor code
+  }
+  
+  async exists() {
+    const err = await getRejection(sqlite3Async.run(`SELECT 1 FROM ${this.name}`));
+    if (err === null) {
+      return true;
+    }
+    if (err.message === `Error: SQLITE_ERROR: no such table: ${this.name}`) {
+      return false;
+    }
+    throw err;
+  }
+  
+  async reset() {
+    await this.drop();
+    await this.create();
+  }
+  
+  async drop() {
+    await sqlite3Async.run(`DROP TABLE ${this.name}`);
+  }
+  
+  async create() {
+    await sqlite3Async.run(`CREATE TABLE ${this.name} (${this.columns})`);
   }
 }
 
