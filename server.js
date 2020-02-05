@@ -10,7 +10,7 @@ const jsonParser = bodyParser.json()
 
 const menu = new database.Table(
   "Menu",
-  "dish TEXT, imageUrl TEXT, spicy BOOL"
+  "dishName TEXT, imageUrl TEXT, spicy BOOL"
 );
 const prices = new database.Table(
   "Prices",

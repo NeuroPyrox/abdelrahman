@@ -13,7 +13,7 @@ const Dish = props => (
     <div>
       <img src={props.image} />
     </div>
-    <h3>{props.name}</h3>
+    <h3>{props.dishName}</h3>
   </Button>
 );
 

@@ -18,11 +18,10 @@ class Menu extends React.Component {
   }
 
   render() {
-    // TODO fix naming ambiguity between "name" and "dish"
     return (
       <div className="menu">
-        {this.state.menu.map(({ imageUrl, dish }) => (
-          <Dish key={dish} image={imageUrl} name={dish} />
+        {this.state.menu.map(({ imageUrl, dishName }) => (
+          <Dish key={dishName} image={imageUrl} dishName={dishName} />
         ))}
       </div>
     );

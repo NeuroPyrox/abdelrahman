@@ -42,7 +42,7 @@ const Row = props => (
       <input
         value={props.dish.name}
         onChange={e =>
-          props.onChange(replaceField(props.dish, "name", e.target.value))
+          props.onChange(replaceField(props.dish, "dishName", e.target.value))
         }
       />
     </td>
@@ -80,11 +80,10 @@ class MenuTable extends React.Component {
     this.nextKey = 0;
   }
 
-  // TODO remove renameKey from this
   showMenu(menu) {
-    const newRows = menu.map((row, i) => ({
+    const newRows = menu.map((dish, i) => ({
       key: this.nextKey + i,
-      dish: renameKey(row, "dish", "name")
+      dish: dish
     }));
     this.nextKey += newRows.length;
     this.setState({ rows: this.state.rows.concat(newRows) });
@@ -110,7 +109,6 @@ class MenuTable extends React.Component {
 
   getTable() {
     return this.state.rows
-      .map(row => renameKey(row.dish, "name", "dish"))
       .filter(dish => dish.name !== "");
   }
 
