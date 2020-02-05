@@ -3,9 +3,9 @@
 const ReactDOM = require("react-dom");
 // Idk why webpack makes me require React here, but I get "Error: React is not defined" otherwise
 const React = require("react");
-const QuantityInput = require("./QuantityInput.jsx");
 const XButton = require("../components/xButton.jsx");
 const Menu = require("./menu.jsx");
+require("./entry.css");
 
 ReactDOM.render(
   <div>

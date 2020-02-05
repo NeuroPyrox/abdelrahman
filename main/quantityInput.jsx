@@ -1,6 +1,7 @@
 "use strict";
 
 const React = require("react");
+require("./quantityInput.css");
 
 const Plus = props => (
   <div>

@@ -1,7 +1,7 @@
 "use strict";
 
 const React = require("react");
-const Dish = require("./Dish.jsx");
+const Dish = require("./dish.jsx");
 require("./menu.css");
 // TODO move these dependencies out of the admin folder
 const api = require("../admin/api.jsx");

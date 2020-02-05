@@ -2,6 +2,7 @@
 
 const React = require("react");
 const Button = require("../components/button.jsx");
+require("./dish.css");
 
 const Dish = props => (
   <Button

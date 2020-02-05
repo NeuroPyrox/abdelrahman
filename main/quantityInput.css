@@ -1,0 +1,55 @@
+.quantityInput {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.quantityInput > input {
+  text-align: center;
+  border-radius: 15px;
+  border: 1px solid lightgray;
+  height: 20px;
+  width: 30px;
+}
+
+.quantityInput > button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  border: 0;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+}
+
+.quantityInput > button::-moz-focus-inner {
+  border: 0;
+}
+
+.quantityInput > button:hover {
+  background-color: lightgray;
+}
+
+.quantityInput > button > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+}
+
+.quantityInput > button > div > div {
+  position: absolute;
+  background-color: black;
+}
+
+.quantityInput > button > div > .verticalLine {
+  height: 15px;
+  width: 3px;
+}
+
+.quantityInput > button > div > .horizontalLine {
+  height: 3px;
+  width: 15px;
+}
