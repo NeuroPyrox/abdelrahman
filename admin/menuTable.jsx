@@ -18,7 +18,7 @@ const renameKey = (object, oldKey, newKey) => {
   delete copy[oldKey];
   copy[newKey] = value;
   return copy;
-}
+};
 
 const replaceIndex = (array, i, value) => {
   const copy = array.slice();
@@ -72,30 +72,21 @@ const Row = props => (
 class MenuTable extends React.Component {
   constructor(props) {
     super(props);
-    // TODO get this data from the server instead
-    this.state = {
-      rows: [
-        {
-          key: 1,
-          dish: {
-            name: "Sweet 'n Sour Chicken",
-            spicy: false,
-            imageUrl:
-              "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Sweetsourchickensoaked.jpg/220px-Sweetsourchickensoaked.jpg"
-          }
-        },
-        {
-          key: 2,
-          dish: {
-            name: "Butter Chicken",
-            spicy: true,
-            imageUrl:
-              "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Chicken_makhani.jpg/220px-Chicken_makhani.jpg"
-          }
-        }
-      ]
-    };
-    this.nextKey = 3;
+    this.state = { rows: [] };
+    api
+      .loadMenu()
+      .then(menu => this.showMenu(menu))
+      .catch(foundBug);
+    this.nextKey = 0;
+  }
+
+  showMenu(menu) {
+    const newRows = menu.map((row, i) => ({
+      key: this.nextKey + i,
+      dish: renameKey(row, "dish", "name")
+    }));
+    this.nextKey += newRows.length;
+    this.setState({ rows: this.state.rows.concat(newRows) });
   }
 
   replaceRow(i, newDish) {
@@ -150,7 +141,9 @@ class MenuTable extends React.Component {
           </tr>
           <tr>
             <td>
-              <button onClick={() => api.saveMenu(this.getTable()).catch(foundBug)}>
+              <button
+                onClick={() => api.saveMenu(this.getTable()).catch(foundBug)}
+              >
                 Save Changes
               </button>
             </td>

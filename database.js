@@ -8,12 +8,6 @@ const sqlite3Async = require("./sqlite3Async.js");
 
 // TODO move this into the Table class once necessary
 /////////////////
-// Unsafe
-async function getTable(tableName) {
-  const table = await sqlite3Async.all(`SELECT * FROM ${tableName}`);
-  return table;
-}
-
 // Unsafe: tableName, row keys
 async function remove(tableName, row) {
   await sqlite3Async.run(
@@ -64,6 +58,11 @@ class Table {
     for (const row of rows) {
       await this.insert(row);
     }
+  }
+  
+  async getAll() {
+    const table = await sqlite3Async.all(`SELECT * FROM ${this.name}`);
+    return table;
   }
   
   // Unsafe: row keys
