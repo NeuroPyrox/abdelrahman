@@ -4,19 +4,23 @@ const React = require("react");
 const XButton = require("../components/xButton.jsx");
 const PlusButton = require("../components/plusButton.jsx");
 
-// The immutable equivalent of object[key] = value
 const replaceField = (object, key, value) => {
   const copy = Object.assign({}, object);
   copy[key] = value;
   return copy;
 };
 
-// The immutable equivalent of array[i] = value
 const replaceIndex = (array, i, value) => {
   const copy = array.slice();
   copy[i] = value;
   return copy;
 };
+
+const deleteIndex = (array, i) => {
+  const copy = array.slice();
+  copy.splice(i, 1);
+  return copy;
+}
 
 const Row = props => (
   <tr>
@@ -46,7 +50,7 @@ const Row = props => (
       />
     </td>
     <td>
-      <XButton />
+      <XButton onClick={props.onDelete}/>
     </td>
   </tr>
 );
@@ -83,6 +87,10 @@ class MenuTable extends React.Component {
     const newRow = { key: this.state.rows[i].key, dish: newDish };
     this.setState({ rows: replaceIndex(this.state.rows, i, newRow) });
   }
+  
+  deleteRow(i) {
+    this.setState({rows: deleteIndex(this.state.rows, i)})
+  }
 
   render() {
     return (
@@ -100,6 +108,7 @@ class MenuTable extends React.Component {
               key={key}
               dish={dish}
               onChange={newDish => this.replaceRow(i, newDish)}
+              onDelete={() => this.deleteRow(i)}
             />
           ))}
         </tbody>
