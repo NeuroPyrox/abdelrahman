@@ -80,6 +80,7 @@ class MenuTable extends React.Component {
     this.nextKey = 0;
   }
 
+  // TODO remove renameKey from this
   showMenu(menu) {
     const newRows = menu.map((row, i) => ({
       key: this.nextKey + i,

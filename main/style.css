@@ -1,3 +1,5 @@
+/* TODO deconstruct this file to include the css dynamically where it's needed */
+
 body {
   font-family: "Merienda";
 }
@@ -56,11 +58,6 @@ body {
 .quantityInput > button > div > .horizontalLine {
   height: 3px;
   width: 15px;
-}
-
-.menu {
-  display: flex;
-  flex-direction: row;
 }
 
 .dish {
