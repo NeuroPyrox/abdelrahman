@@ -20,7 +20,11 @@ const deleteIndex = (array, i) => {
   const copy = array.slice();
   copy.splice(i, 1);
   return copy;
-}
+};
+
+const pushArray = (array, item) => {
+  return array.concat([item]);
+};
 
 const Row = props => (
   <tr>
@@ -50,7 +54,7 @@ const Row = props => (
       />
     </td>
     <td>
-      <XButton onClick={props.onDelete}/>
+      <XButton onClick={props.onDelete} />
     </td>
   </tr>
 );
@@ -81,15 +85,25 @@ class MenuTable extends React.Component {
         }
       ]
     };
+    this.nextKey = 3;
   }
 
   replaceRow(i, newDish) {
     const newRow = { key: this.state.rows[i].key, dish: newDish };
     this.setState({ rows: replaceIndex(this.state.rows, i, newRow) });
   }
-  
+
   deleteRow(i) {
-    this.setState({rows: deleteIndex(this.state.rows, i)})
+    this.setState({ rows: deleteIndex(this.state.rows, i) });
+  }
+
+  addRow() {
+    const newRow = {
+      key: this.nextKey,
+      dish: { name: "", spicy: false, imageUrl: "" }
+    };
+    this.nextKey += 1;
+    this.setState({ rows: pushArray(this.state.rows, newRow) });
   }
 
   render() {
@@ -115,7 +129,7 @@ class MenuTable extends React.Component {
         <tfoot>
           <tr>
             <td>
-              <PlusButton />
+              <PlusButton onClick={() => this.addRow()} />
             </td>
           </tr>
         </tfoot>
