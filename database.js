@@ -1,5 +1,6 @@
 "use strict";
 
+const {onlyHasLetters, assert} = require("./helpers.js");
 const sqlite3Async = require("./sqlite3Async.js");
 
 // Unsafe = vulnerable to SQL injection
@@ -42,11 +43,16 @@ async function getRejection(promise) {
   return null;
 }
 
+const validateColumnName = key => {
+  if (!/^[a-zA-Z]\w*$/.test(key)) {
+    throw Error();
+  }
+}
+
 const validateColumns = columns => {
   for (const [key, value] of Object.entries(columns)) {
-    if (!["INT", "TEXT", "BOOL"].includes(value)) {
-      throw Error();
-    }
+    assert(["INT", "TEXT", "BOOL"].includes(value));
+    validateColumnName(key);
   }
 }
 
