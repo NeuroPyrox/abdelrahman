@@ -4,9 +4,18 @@ const assert = (condition, message = "") => {
   }
 };
 
+const assertThrows = testFunction => {
+  try {
+    testFunction();
+  } catch (err) {
+    return;
+  }
+  throw Error("Didn't throw");
+};
+
 const hasKey = (object, key) => {
-  return object[key] !== undefined
-}
+  return object[key] !== undefined;
+};
 
 const countKeys = object => {
   return Object.keys(object).length;
@@ -61,20 +70,59 @@ const asyncHandler = unwrapped => {
   return async (req, res, next) => {
     try {
       await unwrapped(req, res);
+    } catch (err) {
+      next(err);
+    }
+  };
+};
+
+const asyncThrow = unwrapped => {
+  return async (...args) => {
+    const traced = new Error();
+    try {
+      const result = await unwrapped(...args);
+      return result;
     } catch(err) {
-      next(err)
+      traced.message = err.message;
+      throw traced;
     }
   }
 }
 
+const getRejection = async promise => {
+  try {
+    await promise;
+  } catch (err) {
+    return err;
+  }
+  return null;
+};
+
+const range = n => [...Array(n).keys()];
+
+const isEmptyArray = array => Array.isArray(array) && array.length === 0;
+
+const arraysAreEqual = (a, b) => {
+  if (a.length !== b.length) {
+    return false;
+  }
+  return a.every((item, i) => b[i] === item);
+}
+
 module.exports = {
   assert: assert,
+  assertThrows: assertThrows,
   hasKey: hasKey,
   countKeys: countKeys,
   countCombinedKeys: countCombinedKeys,
   combineEntries: combineEntries,
   wrapIfNotArray: wrapIfNotArray,
   mapValues: mapValues,
-  mapValuesWithKeys,
-  asyncHandler: asyncHandler
+  mapValuesWithKeys: mapValuesWithKeys,
+  asyncHandler: asyncHandler,
+  asyncThrow: asyncThrow,
+  getRejection: getRejection,
+  range: range,
+  isEmptyArray: isEmptyArray,
+  arraysAreEqual: arraysAreEqual
 };

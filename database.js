@@ -1,6 +1,6 @@
 "use strict";
 
-const {onlyHasLetters, assert} = require("./helpers.js");
+const { assert, getRejection, asyncThrow } = require("./helpers.js");
 const sqlite3Async = require("./sqlite3Async.js");
 
 // Unsafe = vulnerable to SQL injection
@@ -27,6 +27,28 @@ async function has(tableName, row) {
 }
 /////////////////
 
+class Mutex {
+  constructor() {
+    this.unlocked = Promise.resolve();
+    this.pending = false;
+  }
+
+  async do(func) {
+    await this.unlocked;
+    // TODO fix the mutex so this doesn't throw
+    assert(!this.pending);
+    this.pending = true;
+    let unlock;
+    this.unlocked = new Promise(resolve => {
+      unlock = resolve;
+    });
+    const result = await func();
+    this.pending = false;
+    unlock();
+    return result;
+  }
+}
+
 // Unsafe: row keys
 function convertToConditions(row) {
   return Object.keys(row)
@@ -34,50 +56,44 @@ function convertToConditions(row) {
     .join(" ");
 }
 
-async function getRejection(promise) {
-  try {
-    await promise;
-  } catch (err) {
-    return err;
-  }
-  return null;
-}
+const isName = name => /^[a-zA-Z]\w*$/.test(name);
 
-const validateColumnName = key => {
-  if (!/^[a-zA-Z]\w*$/.test(key)) {
-    throw Error();
-  }
-}
+const isColumnType = type => ["INT", "TEXT", "BOOL"].includes(type);
 
-const validateColumns = columns => {
-  for (const [key, value] of Object.entries(columns)) {
-    assert(["INT", "TEXT", "BOOL"].includes(value));
-    validateColumnName(key);
-  }
-}
+const columnsAreValid = columns => {
+  return Object.entries(columns).every(
+    ([key, value]) => isName(key) && isColumnType(value)
+  );
+};
 
 // TODO validate input here instead of delegating that task to the function callers
 // TODO make async operations robust against race conditions
 class Table {
   constructor(name, columns) {
-    validateColumns(columns);
+    assert(isName(name));
+    assert(columnsAreValid(columns));
     this.name = name;
     this.columns = columns;
-    // TODO force the constructor caller to await this
-    this.ensureExists();
+    this.lock = new Mutex();
+    this.lock.do(() => this.ensureExists());
+  }
+
+  async getAll() {
+    return this.lock.do(async () => {
+      return sqlite3Async.all(`SELECT * FROM ${this.name}`);
+    });
   }
   
   // Unsafe: row keys
   async setAll(rows) {
-    await this.reset();
-    for (const row of rows) {
-      await this.insert(row);
-    }
-  }
-  
-  async getAll() {
-    const table = await sqlite3Async.all(`SELECT * FROM ${this.name}`);
-    return table;
+    await this.lock.do(
+      async () => {
+        await this.reset();
+        for (const row of rows) {
+          await this.insert(row);
+        }
+      }
+    );
   }
   
   // Unsafe: row keys
@@ -90,17 +106,26 @@ class Table {
       Object.values(row)
     );
   }
-  
+
+  async reset() {
+    await this.drop();
+    await this.create();
+  }
+
   async ensureExists() {
+    this.ensuringExistance = true;
     const exists = await this.exists();
     if (!exists) {
+      console.log(this.name, "does not exist yet")
       await this.create();
     }
-    // Reminder: if you find youself needing to check if the table has the right columns, you wrote poor code
+    this.ensuringExistance = false;
   }
-  
+
   async exists() {
-    const err = await getRejection(sqlite3Async.run(`SELECT 1 FROM ${this.name}`));
+    const err = await getRejection(
+      sqlite3Async.run(`SELECT 1 FROM ${this.name}`)
+    );
     if (err === null) {
       return true;
     }
@@ -110,20 +135,24 @@ class Table {
     throw err;
   }
   
-  async reset() {
-    await this.drop();
-    await this.create();
-  }
-  
   async drop() {
-    await sqlite3Async.run(`DROP TABLE ${this.name}`);
+    await asyncThrow(async () => {
+      try {
+        await sqlite3Async.run(`DROP TABLE ${this.name}`);
+      } catch(err) {
+        throw Error(`Could not drop ${this.name}:\n${err}`)
+      }
+    })();
   }
-  
+
   async create() {
-    await sqlite3Async.run(`CREATE TABLE ${this.name} (${this.columns})`);
+    const signature = Object.entries(this.columns)
+      .map(([column, type]) => `${column} ${type}`)
+      .join(", ");
+    await sqlite3Async.run(`CREATE TABLE ${this.name} (${signature})`);
   }
 }
 
 module.exports = {
   Table: Table
-}
+};

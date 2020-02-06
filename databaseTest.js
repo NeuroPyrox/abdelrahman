@@ -1,44 +1,53 @@
 "use strict";
 
+const {
+  assert,
+  assertThrows,
+  isEmptyArray,
+  range,
+  arraysAreEqual
+} = require("./helpers.js");
 const { Table } = require("./database.js");
 
-const test = (name, testFunction) => {
-  console.log("Testing", name);
-  testFunction();
-  console.log("Passed!");
-};
-
-const assertThrows = testFunction => {
+const test = async (name, testFunction) => {
   try {
-    testFunction();
+    await testFunction();
   } catch (err) {
+    console.log("Failed test:", name);
+    console.error(err);
     return;
   }
-  throw Error("Didn't throw");
+  console.log("Passed test:", name);
 };
 
 test("create table", () => {
-  new Table("test", { someColumn: "INT" });
+  new Table("test0", { someColumn: "INT" });
 });
 
 test("invalid column type", () => {
-  assertThrows(() => new Table("test", { someColumn: "2refudcoj4" }));
+  assertThrows(() => new Table("test1", { someColumn: "2refudcoj4" }));
 });
 
-test("column name shouldn't be empty", () => {
-  assertThrows(() => new Table("test", { "": "INT" }));
+test("invalid column name", () => {
+  assertThrows(() => new Table("test2", { "3": "INT" }));
 });
 
-test("column name shouldn't start with non-letter", () => {
-  assertThrows(() => new Table("test", { "3": "INT" }));
-  assertThrows(() => new Table("test", { "#": "INT" }));
-  assertThrows(() => new Table("test", { "_": "INT" }));
-})
+test("invalid table name", () => {
+  assertThrows(() => new Table("qojf42839*(*)", { someColumn: "INT" }));
+});
 
-test("column name can have numbers and underscores", () => {
-  new Table("test", { q3_: "INT" });
-})
+// TODO uncomment these once I get the mutex working
 
-test("column name shouldn't have non-word characters", () => {
-  assertThrows(() => new Table("test", { "a-": "INT" }));
-})
+// test("get all from new table", async () => {
+//   const table = new Table("test3", { someColumns: "INT" });
+//   const rows = await table.getAll();
+//   assert(isEmptyArray(rows));
+// });
+
+// test("set all", async () => {
+//   const table = new Table("test4", { x2: "INT" });
+//   const expected = range(100).map(x => ({ x2: x * x }));
+//   await table.setAll(expected);
+//   const actual = await table.getAll();
+//   assert(arraysAreEqual(expected, actual));
+// });
