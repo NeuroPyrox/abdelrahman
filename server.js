@@ -1,5 +1,7 @@
 "use strict";
 
+require("./databaseTest.js");
+
 const {asyncHandler} = require("./helpers.js")
 const database = require("./database.js")
 const startServer = require("./startServer.js");
@@ -8,27 +10,25 @@ const bodyParser = require("body-parser");
 
 const jsonParser = bodyParser.json()
 
-const menu = new database.Table(
-  "Menu",
-  "dishName TEXT, imageUrl TEXT, spicy BOOL"
-);
-const prices = new database.Table(
-  "Prices",
-  "numMeals INT, price INT"
-);
-const adminPushSubscriptions = new database.Table(
-  "AdminPushSubscriptions",
-  "endpoint TEXT, p256dh TEXT, auth TEXT"
-);
-const orders = new database.Table(
-  "Orders",
-  `timestamp INT,
-   butterChickenQuantity INT,
-   butterChickenSpiceLevel TEXT,
-   sweetNSourQuantity INT,
-   delivery BOOL,
-   contactInfo TEXT`
-);
+const menu = new database.Table("Menu", {
+  dishName: "TEXT",
+  imageUrl: "TEXT",
+  spicy: "BOOL"
+});
+const prices = new database.Table("Prices", { numMeals: "INT", price: "INT" });
+const adminPushSubscriptions = new database.Table("AdminPushSubscriptions", {
+  endpoint: "TEXT",
+  p256dh: "TEXT",
+  auth: "TEXT"
+});
+const orders = new database.Table("Orders", {
+  timestamp: "INT",
+  butterChickenQuantity: "INT",
+  butterChickenSpiceLevel: "TEXT",
+  sweetNSourQuantity: "INT",
+  delivery: "BOOL",
+  contactInfo: "TEXT"
+});
 
 // TODO this is the sloppiest authentication I can possibly think of. Revise it.
 const adminOnly = (req, res, next) => {

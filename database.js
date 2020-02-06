@@ -42,10 +42,19 @@ async function getRejection(promise) {
   return null;
 }
 
+const validateColumns = columns => {
+  for (const [key, value] of Object.entries(columns)) {
+    if (!["INT", "TEXT", "BOOL"].includes(value)) {
+      throw Error();
+    }
+  }
+}
+
 // TODO validate input here instead of delegating that task to the function callers
 // TODO make async operations robust against race conditions
 class Table {
   constructor(name, columns) {
+    validateColumns(columns);
     this.name = name;
     this.columns = columns;
     // TODO force the constructor caller to await this
