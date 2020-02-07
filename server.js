@@ -1,6 +1,6 @@
 "use strict";
 
-require("./databaseTest.js");
+require("./test.js");
 
 const {asyncHandler} = require("./helpers.js")
 const database = require("./database.js")

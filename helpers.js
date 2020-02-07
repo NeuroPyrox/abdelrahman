@@ -1,3 +1,7 @@
+"use strict";
+
+// TODO make this file feel less monolithic
+
 const assert = (condition, message = "") => {
   if (!condition) {
     throw Error(message);
@@ -82,12 +86,12 @@ const asyncThrow = unwrapped => {
     try {
       const result = await unwrapped(...args);
       return result;
-    } catch(err) {
+    } catch (err) {
       traced.message = err.message;
       throw traced;
     }
-  }
-}
+  };
+};
 
 const getRejection = async promise => {
   try {
@@ -109,6 +113,43 @@ const arraysAreEqual = (a, b) => {
   return a.every((item, i) => b[i] === item);
 }
 
+const singlyNestedArraysAreEqual = (a, b) => {
+  if (a.length !== b.length) {
+    return false;
+  }
+  return a.every((item, i) => arraysAreEqual(b[i], item));
+}
+
+const objectsAreEqual = (a, b) => {
+  return singlyNestedArraysAreEqual(Object.entries(a), Object.entries(b));
+}
+
+const arraysOfObjectsAreEqual = (a, b) => {
+  if (a.length !== b.length) {
+    return false;
+  }
+  return a.every((item, i) => objectsAreEqual(b[i], item));
+};
+
+const test = async (name, testFunction) => {
+  try {
+    await testFunction();
+  } catch (err) {
+    console.log("Failed test:", name);
+    console.error(err);
+    return;
+  }
+  console.log("Passed test:", name);
+};
+
+const wait = async milliseconds => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve();
+    }, milliseconds);
+  });
+};
+
 module.exports = {
   assert: assert,
   assertThrows: assertThrows,
@@ -124,5 +165,9 @@ module.exports = {
   getRejection: getRejection,
   range: range,
   isEmptyArray: isEmptyArray,
-  arraysAreEqual: arraysAreEqual
+  singlyNestedArraysAreEqual: singlyNestedArraysAreEqual,
+  objectsAreEqual: objectsAreEqual,
+  arraysOfObjectsAreEqual: arraysOfObjectsAreEqual,
+  test,
+  wait
 };

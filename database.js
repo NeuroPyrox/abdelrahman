@@ -1,6 +1,7 @@
 "use strict";
 
 const { assert, getRejection, asyncThrow } = require("./helpers.js");
+const Mutex = require("./mutex.js");
 const sqlite3Async = require("./sqlite3Async.js");
 
 // Unsafe = vulnerable to SQL injection
@@ -26,28 +27,6 @@ async function has(tableName, row) {
   return selection !== undefined;
 }
 /////////////////
-
-class Mutex {
-  constructor() {
-    this.unlocked = Promise.resolve();
-    this.pending = false;
-  }
-
-  async do(func) {
-    await this.unlocked;
-    // TODO fix the mutex so this doesn't throw
-    assert(!this.pending);
-    this.pending = true;
-    let unlock;
-    this.unlocked = new Promise(resolve => {
-      unlock = resolve;
-    });
-    const result = await func();
-    this.pending = false;
-    unlock();
-    return result;
-  }
-}
 
 // Unsafe: row keys
 function convertToConditions(row) {
