@@ -1,21 +1,40 @@
 "use strict";
 
+const { assert, catchError } = require("./helpers.js");
 const T = require("./type.js");
 
-T.is(1).validate(1);
-T.is(1).invalidate(2);
+const throws = (type, testCases) => {
+  for (const [value, errorMessage] of testCases) {
+    const err = catchError(() => type.validate(value));
+    assert(
+      err.message === errorMessage,
+      `Error message should have been:\n"${errorMessage}"\nbut was:\n"${err.message}"`
+    );
+  }
+};
 
-T.type("object").validate({ a: 1 });
-T.type("object").invalidate(1);
+let type = T.is(1);
+type.validate(1);
+throws(type, [[0, "0 is not 1"], ["j", "j is not 1"]]);
 
-T.regex(/^hi$/).validate("hi");
-T.regex(/^hi$/).invalidate("hello");
+type = T.type("number");
+type.validate(1);
+throws(type, [[true, "true is not a number"]]);
+
+// Didn't get this test to pass yet
+type = T.and(T.type("boolean"), T.is(true));
+type.validate(true);
+throws(type, [[0, "0 is not a boolean"], [false, "false is not true"]]);
+
+// type = T.regex(/^hi$/);
+// type.validate("hi");
+// throws(type, [
+//   [1, "1 is not a string"],
+//   ["hello", "hello does not match /^hi$/"]
+// ]);
 
 T.choice(1, 2, 3).validate(3);
 T.choice(1, 2, 3).invalidate(4);
-
-T.and(T.choice(1, 2), T.choice(2, 3)).validate(2);
-T.and(T.choice(1, 2), T.choice(2, 3)).invalidate(1);
 
 T.tuple(T.type("number"), T.type("boolean")).validate([1, true]);
 T.tuple(T.type("number"), T.type("boolean")).invalidate([1, true, true]);

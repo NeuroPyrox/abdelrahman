@@ -24,7 +24,7 @@ const assertRejects = async promise => {
     return;
   }
   throw Error("Didn't reject");
-}
+};
 
 const hasKey = (object, key) => {
   return object[key] !== undefined;
@@ -111,6 +111,15 @@ const getRejection = async promise => {
   return null;
 };
 
+const catchError = func => {
+  try {
+    func();
+  } catch (err) {
+    return err;
+  }
+  return null;
+};
+
 const range = n => [...Array(n).keys()];
 
 const isEmptyArray = array => Array.isArray(array) && array.length === 0;
@@ -120,18 +129,18 @@ const arraysAreEqual = (a, b) => {
     return false;
   }
   return a.every((item, i) => b[i] === item);
-}
+};
 
 const singlyNestedArraysAreEqual = (a, b) => {
   if (a.length !== b.length) {
     return false;
   }
   return a.every((item, i) => arraysAreEqual(b[i], item));
-}
+};
 
 const objectsAreEqual = (a, b) => {
   return singlyNestedArraysAreEqual(Object.entries(a), Object.entries(b));
-}
+};
 
 const arraysOfObjectsAreEqual = (a, b) => {
   if (a.length !== b.length) {
@@ -173,6 +182,7 @@ module.exports = {
   asyncHandler: asyncHandler,
   asyncThrow: asyncThrow,
   getRejection: getRejection,
+  catchError: catchError,
   range: range,
   isEmptyArray: isEmptyArray,
   singlyNestedArraysAreEqual: singlyNestedArraysAreEqual,

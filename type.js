@@ -1,13 +1,14 @@
 "use strict";
 
 class Type {
-  constructor(test) {
+  constructor(test, expected = "") {
     this.test = test;
+    this.expected = expected;
   }
 
   validate(value) {
     if (!this.test(value)) {
-      throw Error();
+      throw Error(`${value} is not ${this.expected}`);
     }
   }
 
@@ -18,23 +19,23 @@ class Type {
   }
 }
 
-const is = constant => new Type(value => value === constant);
+const is = constant => new Type(value => value === constant, constant);
 
-const type = name => new Type(value => typeof value === name);
+const type = name => new Type(value => typeof value === name, `a ${name}`);
 
-const regex = pattern => new Type(value => pattern.test(value));
+const and = (...subTypes) =>
+  new Type(value => subTypes.every(subType => subType.test(value)));
+
+const regex = pattern => and(type("string"), new Type(value => pattern.test(value)));
 
 // I would've used array.includes, but the internet didn't tell me if it uses strict equality
 const choice = (...options) =>
   new Type(value => !options.every(option => option !== value));
 
-const and = (...subTypes) =>
-  new Type(value => subTypes.every(subType => subType.test(value)));
-
 const tuple = (...fieldTypes) =>
   new Type(
     value =>
-      (value.length === fieldTypes.length) &&
+      value.length === fieldTypes.length &&
       value.every((field, i) => fieldTypes[i].test(field))
   );
 
