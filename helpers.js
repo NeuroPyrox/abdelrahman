@@ -17,6 +17,15 @@ const assertThrows = testFunction => {
   throw Error("Didn't throw");
 };
 
+const assertRejects = async promise => {
+  try {
+    await promise;
+  } catch (err) {
+    return;
+  }
+  throw Error("Didn't reject");
+}
+
 const hasKey = (object, key) => {
   return object[key] !== undefined;
 };
@@ -153,6 +162,7 @@ const wait = async milliseconds => {
 module.exports = {
   assert: assert,
   assertThrows: assertThrows,
+  assertRejects: assertRejects,
   hasKey: hasKey,
   countKeys: countKeys,
   countCombinedKeys: countCombinedKeys,

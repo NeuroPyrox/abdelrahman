@@ -13,11 +13,22 @@ test("should run once", async () => {
 
 test("should not run while waiting", async () => {
   const mutex = new Mutex();
-  mutex.do(async () => wait(200));
+  mutex.do(async () => wait(2));
   let ran = false;
   mutex.do(() => {
     ran = true;
-  })
-  await wait(100);
+  });
+  await wait(1);
   assert(!ran);
-})
+});
+
+test("should run after waiting", async () => {
+  const mutex = new Mutex();
+  mutex.do(async () => wait(1));
+  let ran = false;
+  mutex.do(() => {
+    ran = true;
+  });
+  await wait(20);
+  assert(ran);
+});

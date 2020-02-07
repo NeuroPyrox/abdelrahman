@@ -3,6 +3,7 @@
 const {
   assert,
   assertThrows,
+  assertRejects,
   isEmptyArray,
   range,
   arraysOfObjectsAreEqual,
@@ -14,16 +15,9 @@ test("create table", () => {
   new Table("test0", { someColumn: "INT" });
 });
 
-test("invalid column type", () => {
-  assertThrows(() => new Table("test1", { someColumn: "2refudcoj4" }));
-});
-
-test("invalid column name", () => {
-  assertThrows(() => new Table("test2", { "3": "INT" }));
-});
-
-test("invalid table name", () => {
-  assertThrows(() => new Table("qojf42839*(*)", { someColumn: "INT" }));
+test("can't make two with same name", async () => {
+  new Table("test5", { x2: "INT" });
+  assertThrows(() => new Table("test5", { x2: "INT" }));
 });
 
 test("get all from new table", async () => {

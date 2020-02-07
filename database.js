@@ -1,6 +1,7 @@
 "use strict";
 
-const { assert, getRejection, asyncThrow } = require("./helpers.js");
+const { assert, getRejection, asyncThrow, mapValues } = require("./helpers.js");
+const T = require("./type.js");
 const Mutex = require("./mutex.js");
 const sqlite3Async = require("./sqlite3Async.js");
 
@@ -35,47 +36,23 @@ function convertToConditions(row) {
     .join(" ");
 }
 
-const isName = name => /^[a-zA-Z]\w*$/.test(name);
-
-const isColumnType = type => ["INT", "TEXT", "BOOL"].includes(type);
-
-const columnsAreValid = columns => {
-  return Object.entries(columns).every(
-    ([key, value]) => isName(key) && isColumnType(value)
-  );
-};
-
-// TODO validate input here instead of delegating that task to the function callers
-// TODO make async operations robust against race conditions
-class Table {
+class UnsafeTable {
   constructor(name, columns) {
-    assert(isName(name));
-    assert(columnsAreValid(columns));
     this.name = name;
     this.columns = columns;
-    this.lock = new Mutex();
-    this.lock.do(() => this.ensureExists());
   }
 
   async getAll() {
-    return this.lock.do(async () => {
-      return sqlite3Async.all(`SELECT * FROM ${this.name}`);
-    });
+    return sqlite3Async.all(`SELECT * FROM ${this.name}`);
   }
-  
-  // Unsafe: row keys
+
   async setAll(rows) {
-    await this.lock.do(
-      async () => {
-        await this.reset();
-        for (const row of rows) {
-          await this.insert(row);
-        }
-      }
-    );
+    await this.reset();
+    for (const row of rows) {
+      await this.insert(row);
+    }
   }
-  
-  // Unsafe: row keys
+
   async insert(row) {
     const keys = Object.keys(row);
     const columns = keys.join(", ");
@@ -92,13 +69,10 @@ class Table {
   }
 
   async ensureExists() {
-    this.ensuringExistance = true;
     const exists = await this.exists();
     if (!exists) {
-      console.log(this.name, "does not exist yet")
       await this.create();
     }
-    this.ensuringExistance = false;
   }
 
   async exists() {
@@ -113,15 +87,13 @@ class Table {
     }
     throw err;
   }
-  
+
   async drop() {
-    await asyncThrow(async () => {
-      try {
-        await sqlite3Async.run(`DROP TABLE ${this.name}`);
-      } catch(err) {
-        throw Error(`Could not drop ${this.name}:\n${err}`)
-      }
-    })();
+    try {
+      await sqlite3Async.run(`DROP TABLE ${this.name}`);
+    } catch (err) {
+      throw Error(`Could not drop ${this.name}:\n${err}`);
+    }
   }
 
   async create() {
@@ -129,6 +101,50 @@ class Table {
       .map(([column, type]) => `${column} ${type}`)
       .join(", ");
     await sqlite3Async.run(`CREATE TABLE ${this.name} (${signature})`);
+  }
+}
+
+const nameType = T.regex(/^[a-zA-Z]\w*$/);
+
+const columnsType = T.map(nameType, T.choice("INT", "TEXT", "BOOL"));
+
+const takenNames = {};
+
+class Table {
+  constructor(name, columns) {
+    nameType.validate(name);
+    columnsType.validate(columns);
+    assert(!takenNames[name]);
+    takenNames[name] = true;
+    this.unsafe = new UnsafeTable(name, columns);
+    this.rowsType = T.array(
+      T.object(
+        mapValues(
+          columns,
+          value =>
+            ({ INT: T.int, TEXT: T.type("string"), BOOL: T.type("boolean") }[
+              value
+            ])
+        )
+      )
+    );
+    this.lock = new Mutex();
+    this.lock.do(() => this.unsafe.ensureExists());
+  }
+
+  async getAll() {
+    return this.lock.do(() => this.unsafe.getAll());
+  }
+
+  async setAll(rows) {
+    this.rowsType.validate(rows);
+    const columnNames = Object.keys(this.unsafe.columns);
+    for (const row of rows) {
+      for (const key of Object.keys(row)) {
+        assert(columnNames.includes(key));
+      }
+    }
+    await this.lock.do(() => this.unsafe.setAll(rows));
   }
 }
 
