@@ -1,65 +1,62 @@
 "use strict";
 
-const { assert, catchError } = require("./helpers.js");
+const { assertThrows } = require("./helpers.js");
 const T = require("./type.js");
 
-const throws = (type, testCases) => {
-  for (const [value, errorMessage] of testCases) {
-    const err = catchError(() => type.validate(value));
-    assert(
-      err.message === errorMessage,
-      `Error message should have been:\n"${errorMessage}"\nbut was:\n"${err.message}"`
-    );
-  }
-};
+let t = T.choice(true, 2);
+t.validate(true);
+t.validate(2);
+assertThrows(() => t.validate(false));
+assertThrows(() => t.validate("3"));
 
-let type = T.is(1);
-type.validate(1);
-throws(type, [[0, "0 is not 1"], ["j", "j is not 1"]]);
+t = T.type("boolean");
+t.validate(true);
+t.validate(false);
+assertThrows(() => t.validate(1));
+assertThrows(() => T.type("not a type"));
 
-type = T.type("number");
-type.validate(1);
-throws(type, [[true, "true is not a number"]]);
+t = T.int;
+t.validate(0);
+t.validate(1);
+t.validate(-1);
+t.validate(1.000000000000000001);
+assertThrows(() => t.validate(1.5));
+assertThrows(() => t.validate(NaN));
+assertThrows(() => t.validate(Infinity));
+assertThrows(() => t.validate(-Infinity));
+assertThrows(() => t.validate("1"));
 
-// Didn't get this test to pass yet
-type = T.and(T.type("boolean"), T.is(true));
-type.validate(true);
-throws(type, [[0, "0 is not a boolean"], [false, "false is not true"]]);
+t = T.regex(/^hi$/);
+t.validate("hi");
+assertThrows(() => t.validate("hello"));
+assertThrows(() => t.validate(123));
+assertThrows(() => T.regex(123));
 
-// type = T.regex(/^hi$/);
-// type.validate("hi");
-// throws(type, [
-//   [1, "1 is not a string"],
-//   ["hello", "hello does not match /^hi$/"]
-// ]);
+t = T.array(T.choice(1, 2, 3));
+t.validate([1, 2, 3, 2, 1]);
+t.validate([]);
+assertThrows(() => t.validate([4]));
+assertThrows(() => t.validate("abc"));
+assertThrows(() => T.array("not a type"))
 
-T.choice(1, 2, 3).validate(3);
-T.choice(1, 2, 3).invalidate(4);
+t = T.object({ a: T.type("number"), b: T.type("string") });
+t.validate({a: 5, b: "abc"});
+assertThrows(() => t.validate({a: 5, b: 5}));
+assertThrows(() => t.validate({a: 5, c: "abc"}));
+assertThrows(() => t.validate({a: 5}));
+assertThrows(() => t.validate("not an object"));
+assertThrows(() => T.object({a: "not a type"}))
+assertThrows(() => T.object("not an object"))
 
-T.tuple(T.type("number"), T.type("boolean")).validate([1, true]);
-T.tuple(T.type("number"), T.type("boolean")).invalidate([1, true, true]);
-T.tuple(T.type("number"), T.type("boolean")).invalidate([1, 1]);
-
-T.array(T.type("number")).validate([1, 2, 3]);
-T.array(T.type("number")).invalidate([1, 2, true]);
-
-T.map(T.choice("a", "b"), T.type("number")).validate({ a: 1 });
-T.map(T.choice("a", "b"), T.type("number")).invalidate({ z: 1 });
-T.map(T.choice("a", "b"), T.type("number")).invalidate({ a: "1" });
-
-T.object({ a: T.type("string"), b: T.type("number") }).validate({
-  a: "1",
-  b: 2
-});
-T.object({ a: T.type("string"), b: T.type("number") }).invalidate({
-  a: "1",
-  b: "2"
-});
-T.object({ a: T.type("string"), b: T.type("number") }).invalidate({
-  a: "1"
-});
-T.object({ a: T.type("string"), b: T.type("number") }).invalidate({
-  a: "1",
-  b: 2,
-  c: 3
-});
+t = T.map(T.regex(/^a+$/), T.choice(1, 2));
+t.validate({});
+t.validate({ a: 1 });
+t.validate({ a: 1, aa: 2 });
+assertThrows(() => t.validate({ b: 1 }));
+assertThrows(() => t.validate({ a: 5 }));
+assertThrows(() => t.validate([1, 2]));
+assertThrows(() => t.validate(null));
+assertThrows(() => T.map(T.regex(/^a+$/), { validate: 1 }));
+assertThrows(() => T.map(T.regex(/^a+$/), "abc"));
+assertThrows(() => T.map("abc", T.choice(1, 2)));
+assertThrows(() => T.map());

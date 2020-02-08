@@ -26,12 +26,10 @@ test("get all from new table", async () => {
   assert(isEmptyArray(rows));
 });
 
-// TODO uncomment once the type module works
-
-// test("set all", async () => {
-//   const table = new Table("test4", { x2: "INT" });
-//   const expected = range(100).map(x => ({ x2: x * x }));
-//   await table.setAll(expected);
-//   const actual = await table.getAll();
-//   assert(arraysOfObjectsAreEqual(expected, actual));
-// });
+test("set all", async () => {
+  const table = new Table("test4", { x2: "INT" });
+  const expected = range(100).map(x => ({ x2: x * x }));
+  await table.setAll(expected);
+  const actual = await table.getAll();
+  assert(arraysOfObjectsAreEqual(expected, actual));
+});

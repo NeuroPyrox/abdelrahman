@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "start": "webpack && node server.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "webpack": "^4.41.4",

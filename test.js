@@ -6,3 +6,5 @@
 require("./databaseTest.js");
 require("./mutexTest.js");
 require("./typeTest.js");
+
+console.log("done testing");

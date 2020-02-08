@@ -1,72 +1,93 @@
 "use strict";
 
+const { assert } = require("./helpers.js");
+
+const isRegex = pattern => {
+  return Object.prototype.toString.call(pattern) === "[object RegExp]";
+};
+
 class Type {
-  constructor(test, expected = "") {
-    this.test = test;
-    this.expected = expected;
-  }
-
-  validate(value) {
-    if (!this.test(value)) {
-      throw Error(`${value} is not ${this.expected}`);
-    }
-  }
-
-  invalidate(value) {
-    if (this.test(value)) {
-      throw Error();
-    }
+  constructor(validate) {
+    this.validate = validate;
   }
 }
 
-const is = constant => new Type(value => value === constant, constant);
+const choice = (...options) => {
+  return new Type(value => {
+    assert(options.includes(value));
+  });
+};
 
-const type = name => new Type(value => typeof value === name, `a ${name}`);
+const type = name => {
+  choice(
+    "undefined",
+    "object",
+    "boolean",
+    "number",
+    "bigint",
+    "string",
+    "symbol",
+    "function"
+  ).validate(name);
+  return new Type(value => {
+    assert(typeof value === name);
+  });
+};
 
-const and = (...subTypes) =>
-  new Type(value => subTypes.every(subType => subType.test(value)));
+const int = new Type(value => {
+  assert(Number.isInteger(value));
+});
 
-const regex = pattern => and(type("string"), new Type(value => pattern.test(value)));
+const regex = pattern => {
+  assert(isRegex(pattern));
+  return new Type(value => {
+    type("string").validate(value);
+    assert(pattern.test(value));
+  });
+};
 
-// I would've used array.includes, but the internet didn't tell me if it uses strict equality
-const choice = (...options) =>
-  new Type(value => !options.every(option => option !== value));
+const array = elementType => {
+  assert(elementType instanceof Type);
+  return new Type(value => {
+    assert(Array.isArray(value));
+    for (const element of value) {
+      elementType.validate(element);
+    }
+  })
+}
 
-const tuple = (...fieldTypes) =>
-  new Type(
-    value =>
-      value.length === fieldTypes.length &&
-      value.every((field, i) => fieldTypes[i].test(field))
-  );
+const object = valueTypes => {
+  type("object").validate(valueTypes);
+  for (const valueType of Object.values(valueTypes)) {
+    assert(valueType instanceof Type);
+  }
+  const numKeys = Object.keys(valueTypes).length;
+  return new Type(objectValue => {
+    assert(Object.keys(objectValue).length === numKeys);
+    for (const [key, value] of Object.entries(objectValue)) {
+      valueTypes[key].validate(value);
+    }
+  })
+}
 
-const array = memberType =>
-  new Type(value => value.every(member => memberType.test(member)));
-
-const map = (keyType, valueType) =>
-  new Type(value =>
-    array(tuple(keyType, valueType)).test(Object.entries(value))
-  );
-
-const object = fieldTypes =>
-  and(
-    type("object"),
-    new Type(value =>
-      tuple(
-        ...Object.entries(fieldTypes).map(([key, fieldType]) =>
-          tuple(is(key), fieldType)
-        )
-      ).test(Object.entries(value))
-    )
-  );
+const map = (keyType, valueType) => {
+  assert(keyType instanceof Type);
+  assert(valueType instanceof Type);
+  return new Type(mapValue => {
+    type("object").validate(mapValue);
+    for (const [key, value] of Object.entries(mapValue)) {
+      keyType.validate(key);
+      valueType.validate(value);
+    }
+  });
+};
 
 module.exports = {
-  is: is,
-  type: type,
-  regex: regex,
   choice: choice,
-  and: and,
-  tuple: tuple,
+  type: type,
+  int: int,
+  regex: regex,
   array: array,
-  map: map,
-  object: object
+  object: object,
+  map: map
 };
