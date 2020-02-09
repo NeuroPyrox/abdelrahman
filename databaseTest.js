@@ -6,30 +6,48 @@ const {
   assertRejects,
   isEmptyArray,
   range,
-  arraysOfObjectsAreEqual,
-  test
+  arraysOfObjectsAreEqual
 } = require("./helpers.js");
 const { Table } = require("./database.js");
 
-test("create table", () => {
-  new Table("test0", { someColumn: "INT" });
-});
+(async () => {
+  const table = new Table("test", { x: "INT", y: "TEXT" });
 
-test("can't make two with same name", async () => {
-  new Table("test5", { x2: "INT" });
-  assertThrows(() => new Table("test5", { x2: "INT" }));
-});
+  // Ways that you can screw up table initialization
+  assertThrows(
+    () => new Table("test", { x: "INT", y: "TEXT" }),
+    "can't make two tables with the same name" // This limitation prevents async errors
+  );
+  assertThrows(
+    () => new Table("@#$", { x: "INT", y: "TEXT" }),
+    "name must be sanitized"
+  );
+  assertThrows(
+    () => new Table("test2", { $x: "INT", $y: "TEXT" }),
+    "column names must be sanitized"
+  );
+  assertThrows(
+    () => new Table("test3", { x: "IDK", y: "IDK" }),
+    "column types must be sanitized"
+  );
+  assertThrows(() => new Table("test4", {}, "must have at least one column"));
+  // From those tests, it's pretty easy to extrapolate that type errors throw too
 
-test("get all from new table", async () => {
-  const table = new Table("test3", { someColumns: "INT" });
-  const rows = await table.getAll();
-  assert(isEmptyArray(rows));
-});
+  // Remember, we defined table at the top of this function
+  const initialData = await table.getAll();
+  assert(isEmptyArray(initialData));
 
-test("set all", async () => {
-  const table = new Table("test4", { x2: "INT" });
-  const expected = range(100).map(x => ({ x2: x * x }));
-  await table.setAll(expected);
-  const actual = await table.getAll();
-  assert(arraysOfObjectsAreEqual(expected, actual));
-});
+  const setTo = [
+    {
+      x: 1,
+      y: "abc"
+    },
+    {
+      x: 2,
+      y: "def"
+    }
+  ];
+  await table.setAll(setTo);
+  const gotten = await table.getAll();
+  assert(arraysOfObjectsAreEqual(setTo, gotten));
+})();

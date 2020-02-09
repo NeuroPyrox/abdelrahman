@@ -138,13 +138,11 @@ class Table {
 
   async setAll(rows) {
     this.rowsType.validate(rows);
-    const columnNames = Object.keys(this.unsafe.columns);
-    for (const row of rows) {
-      for (const key of Object.keys(row)) {
-        assert(columnNames.includes(key));
-      }
-    }
     await this.lock.do(() => this.unsafe.setAll(rows));
+  }
+  
+  reset() {
+    
   }
 }
 
