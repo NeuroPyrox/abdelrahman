@@ -1,7 +1,7 @@
 "use strict";
 
 // TODO this is only place jsonHttp is required. Merge it with this file
-const jsonHttp = require("./jsonHttp.jsx")
+const jsonHttp = require("./jsonHttp.jsx");
 
 async function assertResponseIsOk(res) {
   if (!res.ok) {
@@ -10,11 +10,10 @@ async function assertResponseIsOk(res) {
   }
 }
 
-
 async function getPublicKey() {
   const body = await jsonHttp.get("/public-key");
   return body.key;
-};
+}
 
 async function addSubscription(subscription) {
   const encodedEndpoint = encodeURIComponent(subscription.endpoint);
@@ -22,14 +21,14 @@ async function addSubscription(subscription) {
 
   const asObject = JSON.parse(JSON.stringify(subscription));
   const body = JSON.stringify(asObject.keys);
-  
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: body
-    });
-    await assertResponseIsOk(res);
-};
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: body
+  });
+  await assertResponseIsOk(res);
+}
 
 const removeSubscription = async endpoint => {
   const url = `/order-subscriptions?endpoint=${encodeURIComponent(endpoint)}`;
@@ -62,7 +61,10 @@ const getOrders = async () => {
 const saveMenu = async menu => {
   const res = await fetch("/menu", {
     method: "PUT",
-    headers: { "Content-Type": "application/json", "Authorization": "insecurePassword" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "insecurePassword"
+    },
     body: JSON.stringify(menu)
   });
   await assertResponseIsOk(res);
@@ -72,7 +74,7 @@ const loadMenu = async () => {
   const res = await fetch("/menu");
   await assertResponseIsOk(res);
   return res.json();
-}
+};
 
 module.exports = {
   getPublicKey: getPublicKey,
@@ -82,4 +84,4 @@ module.exports = {
   getOrders: getOrders,
   saveMenu: saveMenu,
   loadMenu: loadMenu
-}
+};
