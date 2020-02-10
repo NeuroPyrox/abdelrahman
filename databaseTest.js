@@ -10,6 +10,9 @@ const {
 } = require("./helpers.js");
 const { Table } = require("./database.js");
 
+// We don't test trivial type errors here because typeTest.js handles that
+// and it'd be testing whether a dependency works
+
 (async () => {
   const table = new Table("test", { x: "INT", y: "TEXT" });
 
@@ -30,8 +33,7 @@ const { Table } = require("./database.js");
     () => new Table("test3", { x: "IDK", y: "IDK" }),
     "column types must be sanitized"
   );
-  assertThrows(() => new Table("test4", {}, "must have at least one column"));
-  // From those tests, it's pretty easy to extrapolate that type errors throw too
+  assertThrows(() => new Table("test4", {}), "must have at least one column");
 
   // Remember, we defined table at the top of this function
   const initialData = await table.getAll();
@@ -50,4 +52,16 @@ const { Table } = require("./database.js");
   await table.setAll(setTo);
   const gotten = await table.getAll();
   assert(arraysOfObjectsAreEqual(setTo, gotten));
+
+  // Ways you can screw up setAll's input
+  const wrongColumnType = [{ x: 1, y: 2 }];
+  const missingColumn = [{x: 1}]
+  const extraColumn = [{x: 1, y: "abc", z: true}]
+  await assertRejects(table.setAll(wrongColumnType));
+  await assertRejects(table.setAll(missingColumn));
+  await assertRejects(table.setAll(extraColumn));
+
+  await table.reset();
+  const afterResetting = await table.getAll();
+  assert(isEmptyArray(afterResetting));
 })();

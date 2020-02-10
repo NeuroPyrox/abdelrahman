@@ -18,12 +18,13 @@ const assertThrows = testFunction => {
 };
 
 const assertRejects = async promise => {
+  const withStackTrace = Error("Didn't reject");
   try {
     await promise;
   } catch (err) {
     return;
   }
-  throw Error("Didn't reject");
+  throw withStackTrace;
 };
 
 const hasKey = (object, key) => {

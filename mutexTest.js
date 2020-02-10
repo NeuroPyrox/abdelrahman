@@ -7,6 +7,8 @@ const Mutex = require("./mutex.js");
 // when the difference in waiting times is 20 milliseconds or less,
 // but the fishy part is that they fail randomly
 
+// TODO manually resolve the waits instead of relying on a timer
+
 test("should run once", async () => {
   let ran = false;
   await new Mutex().do(() => {
