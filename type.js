@@ -1,6 +1,6 @@
 "use strict";
 
-const { assert } = require("./helpers.js");
+const { assert, countKeys } = require("./helpers.js");
 
 const isRegex = pattern => {
   return Object.prototype.toString.call(pattern) === "[object RegExp]";
@@ -63,7 +63,8 @@ const object = valueTypes => {
   }
   const numKeys = Object.keys(valueTypes).length;
   return new Type(objectValue => {
-    assert(Object.keys(objectValue).length === numKeys);
+    const countedKeys = countKeys(objectValue)
+    assert(countedKeys === numKeys, `Expected ${numKeys} keys but got ${countedKeys}`);
     for (const [key, value] of Object.entries(objectValue)) {
       valueTypes[key].validate(value);
     }

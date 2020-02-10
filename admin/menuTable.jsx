@@ -40,7 +40,7 @@ const Row = props => (
   <tr>
     <td>
       <input
-        value={props.dish.name}
+        value={props.dish.dishName}
         onChange={e =>
           props.onChange(replaceField(props.dish, "dishName", e.target.value))
         }
@@ -69,6 +69,7 @@ const Row = props => (
   </tr>
 );
 
+// TODO figure out how to automate my tests next time
 class MenuTable extends React.Component {
   constructor(props) {
     super(props);
@@ -101,7 +102,7 @@ class MenuTable extends React.Component {
   addRow() {
     const newRow = {
       key: this.nextKey,
-      dish: { name: "", spicy: false, imageUrl: "" }
+      dish: { dishName: "", spicy: false, imageUrl: "" }
     };
     this.nextKey += 1;
     this.setState({ rows: pushArray(this.state.rows, newRow) });
@@ -109,7 +110,8 @@ class MenuTable extends React.Component {
 
   getTable() {
     return this.state.rows
-      .filter(dish => dish.name !== "");
+      .map(row => row.dish)
+      .filter(dish => dish.dishName !== "");
   }
 
   render() {

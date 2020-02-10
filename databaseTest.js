@@ -36,6 +36,7 @@ const { Table } = require("./database.js");
   assertThrows(() => new Table("test4", {}), "must have at least one column");
 
   // Remember, we defined table at the top of this function
+  // TODO make this test not depend on reset() being called at the end
   const initialData = await table.getAll();
   assert(isEmptyArray(initialData));
 
