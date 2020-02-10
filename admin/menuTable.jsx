@@ -3,7 +3,7 @@
 const React = require("react");
 const XButton = require("../shared/xButton.jsx");
 const PlusButton = require("../shared/plusButton.jsx");
-const api = require("./api.jsx");
+const api = require("../shared/api.jsx");
 const foundBug = require("../shared/foundBug.jsx");
 
 const replaceField = (object, key, value) => {

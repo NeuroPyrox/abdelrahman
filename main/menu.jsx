@@ -4,8 +4,7 @@ const React = require("react");
 const Dish = require("./dish.jsx");
 require("./menu.css");
 const foundBug = require("../shared/foundBug.jsx");
-// TODO move these dependencies out of the admin folder
-const api = require("../admin/api.jsx");
+const api = require("../shared/api.jsx");
 
 class Menu extends React.Component {
   constructor(props) {

@@ -1,6 +1,6 @@
 "use strict";
 
-const api = require("./api.jsx");
+const api = require("../shared/api.jsx");
 
 module.exports = {
   subscribe: async function subscribe() {

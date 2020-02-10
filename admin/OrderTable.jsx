@@ -1,7 +1,7 @@
 
 const React = require("react");
 const ReactDOM = require("react-dom");
-const api = require("./api.jsx");
+const api = require("../shared/api.jsx");
 const foundBug = require("../shared/foundBug.jsx");
 
 module.exports = class OrderTable extends React.Component {
