@@ -79,7 +79,6 @@ const redirect = path => {
   });
 };
 
-// TODO protect against SQL injection and erroneous input
 const table = databaseTable => {
   return asyncService({
     get: async (req, res) => {
@@ -93,16 +92,17 @@ const table = databaseTable => {
     },
 
     post: async (req, res) => {
+      // TODO implement insert
       await databaseTable.insert(req.body);
       res.end();
     }
   });
 };
 
-// TODO protect against SQL injection and erroneous input
 const tableRow = table => {
   return asyncService({
     head: async (req, res) => {
+      // TODO implement exists
       const exists = await table.exists(req.params);
       if (!exists) {
         return res.sendStatus(404);
@@ -112,11 +112,13 @@ const tableRow = table => {
 
     put: async (req, res) => {
       const row = combineEntries([req.params, req.body]);
+      // TODO implement insert
       await table.insert(row);
       res.end();
     },
 
     delete: async (req, res) => {
+      // TODO implement remove
       await table.remove(req.params);
       res.end();
     }

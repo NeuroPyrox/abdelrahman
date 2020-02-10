@@ -13,7 +13,7 @@ test("should run once", async () => {
   const [promise, resolve] = outerResolve();
   const derivedPromise = new Mutex().do(() => promise);
   resolve();
-  assertResolves(derivedPromise, 200);
+  await assertResolves(derivedPromise, 200);
 });
 
 test("should not run while waiting", async () => {
@@ -31,5 +31,5 @@ test("should run after waiting", async () => {
   mutex.do(() => promise1);
   mutex.do(resolve2);
   resolve1();
-  assertResolves(promise2, 200);
+  await assertResolves(promise2, 200);
 });

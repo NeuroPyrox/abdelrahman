@@ -18,6 +18,7 @@ class Menu extends React.Component {
   }
 
   render() {
+    // TODO fix unique key prop warning
     return (
       <div className="menu">
         {this.state.menu.map(({ imageUrl, dishName }) => (

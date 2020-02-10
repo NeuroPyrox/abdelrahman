@@ -1,8 +1,8 @@
 "use strict";
 
 const React = require("react");
-const XButton = require("../components/xButton.jsx");
-const PlusButton = require("../components/plusButton.jsx");
+const XButton = require("../shared/xButton.jsx");
+const PlusButton = require("../shared/plusButton.jsx");
 const api = require("./api.jsx");
 const foundBug = require("./foundBug.jsx");
 

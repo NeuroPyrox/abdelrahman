@@ -1,7 +1,7 @@
 "use strict";
 
 const React = require("react");
-const Button = require("../components/button.jsx");
+const Button = require("../shared/button.jsx");
 require("./dish.css");
 
 const Dish = props => (
