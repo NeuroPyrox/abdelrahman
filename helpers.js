@@ -1,6 +1,7 @@
 "use strict";
 
 // TODO make this file feel less monolithic
+// TODO figure out which of these functions I can throw away
 
 const assert = (condition, message = "") => {
   if (!condition) {
@@ -161,14 +162,26 @@ const test = async (name, testFunction) => {
   console.log("Passed test:", name);
 };
 
-const wait = async milliseconds => {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve();
-    }, milliseconds);
+const waitForever = async () => new Promise(_ => {});
+
+const outerResolve = () => {
+  let outer;
+  const promise = new Promise(resolve => {
+    outer = resolve;
   });
+  return [promise, outer];
 };
 
+const assertResolves = (promise, timeout) => {
+  return Promise.race([
+    promise,
+    new Promise((resolve, reject) => {
+      setTimeout(reject, timeout);
+    })
+  ]);
+};
+
+// TODO investigate why the last few lines of this aren't causing any errors
 module.exports = {
   assert: assert,
   assertThrows: assertThrows,
@@ -190,5 +203,7 @@ module.exports = {
   objectsAreEqual: objectsAreEqual,
   arraysOfObjectsAreEqual: arraysOfObjectsAreEqual,
   test,
-  wait
+  waitForever,
+  outerResolve,
+  assertResolves
 };

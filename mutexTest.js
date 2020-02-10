@@ -1,40 +1,35 @@
 "use strict";
 
-const { test, assert, wait } = require("./helpers.js");
+const {
+  test,
+  assert,
+  waitForever,
+  outerResolve,
+  assertResolves
+} = require("./helpers.js");
 const Mutex = require("./mutex.js");
 
-// WARNING I'm suspicious of these tests because they fail
-// when the difference in waiting times is 20 milliseconds or less,
-// but the fishy part is that they fail randomly
-
-// TODO manually resolve the waits instead of relying on a timer
-
 test("should run once", async () => {
-  let ran = false;
-  await new Mutex().do(() => {
-    ran = true;
-  });
-  assert(ran);
+  const [promise, resolve] = outerResolve();
+  const derivedPromise = new Mutex().do(() => promise);
+  resolve();
+  assertResolves(derivedPromise, 200);
 });
 
 test("should not run while waiting", async () => {
   const mutex = new Mutex();
-  mutex.do(async () => wait(100));
-  let ran = false;
+  mutex.do(waitForever);
   mutex.do(() => {
-    ran = true;
+    throw Error();
   });
-  await wait(1);
-  assert(!ran);
 });
 
 test("should run after waiting", async () => {
+  const [promise1, resolve1] = outerResolve();
+  const [promise2, resolve2] = outerResolve();
   const mutex = new Mutex();
-  mutex.do(async () => wait(1));
-  let ran = false;
-  mutex.do(() => {
-    ran = true;
-  });
-  await wait(100);
-  assert(ran);
+  mutex.do(() => promise1);
+  mutex.do(resolve2);
+  resolve1();
+  assertResolves(promise2, 200);
 });
