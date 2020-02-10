@@ -126,9 +126,9 @@ const tableRow = table => {
 };
 
 module.exports = {
-  staticFile: staticFile,
-  staticJson: staticJson,
-  redirect: redirect,
-  table: table,
-  tableRow: tableRow
+  staticFile,
+  staticJson,
+  redirect,
+  table,
+  tableRow
 }

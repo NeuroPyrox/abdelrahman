@@ -77,11 +77,11 @@ const loadMenu = async () => {
 };
 
 module.exports = {
-  getPublicKey: getPublicKey,
-  addSubscription: addSubscription,
-  removeSubscription: removeSubscription,
-  hasSubscription: hasSubscription,
-  getOrders: getOrders,
-  saveMenu: saveMenu,
-  loadMenu: loadMenu
+  getPublicKey,
+  addSubscription,
+  removeSubscription,
+  hasSubscription,
+  getOrders,
+  saveMenu,
+  loadMenu
 };

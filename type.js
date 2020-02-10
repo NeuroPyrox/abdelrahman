@@ -83,11 +83,11 @@ const map = (keyType, valueType) => {
 };
 
 module.exports = {
-  choice: choice,
-  type: type,
-  int: int,
-  regex: regex,
-  array: array,
-  object: object,
-  map: map
+  choice,
+  type,
+  int,
+  regex,
+  array,
+  object,
+  map
 };

@@ -114,7 +114,7 @@ class Table {
   constructor(name, columns) {
     nameType.validate(name);
     columnsType.validate(columns);
-    assert(1 <= Object.keys(columns).length)
+    assert(1 <= Object.keys(columns).length);
     assert(!takenNames[name]);
     takenNames[name] = true;
     this.unsafe = new UnsafeTable(name, columns);
@@ -141,14 +141,14 @@ class Table {
     this.rowsType.validate(rows);
     await this.lock.do(() => this.unsafe.setAll(rows));
   }
-  
+
   async reset() {
     await this.lock.do(async () => {
       await this.unsafe.reset();
-    })
+    });
   }
 }
 
 module.exports = {
-  Table: Table
+  Table
 };
