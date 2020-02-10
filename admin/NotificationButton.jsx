@@ -2,7 +2,7 @@
 const React = require("react");
 const ReactDOM = require("react-dom");
 const push = require("./push.jsx");
-const foundBug = require("./foundBug.jsx");
+const foundBug = require("../shared/foundBug.jsx");
 
 // TODO listen for outside subscription changes
 
