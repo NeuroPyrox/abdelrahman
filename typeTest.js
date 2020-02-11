@@ -37,16 +37,16 @@ t.validate([1, 2, 3, 2, 1]);
 t.validate([]);
 assertThrows(() => t.validate([4]));
 assertThrows(() => t.validate("abc"));
-assertThrows(() => T.array("not a type"))
+assertThrows(() => T.array("not a type"));
 
 t = T.object({ a: T.type("number"), b: T.type("string") });
-t.validate({a: 5, b: "abc"});
-assertThrows(() => t.validate({a: 5, b: 5}));
-assertThrows(() => t.validate({a: 5, c: "abc"}));
-assertThrows(() => t.validate({a: 5}));
+t.validate({ a: 5, b: "abc" });
+assertThrows(() => t.validate({ a: 5, b: 5 }));
+assertThrows(() => t.validate({ a: 5, c: "abc" }));
+assertThrows(() => t.validate({ a: 5 }));
 assertThrows(() => t.validate("not an object"));
-assertThrows(() => T.object({a: "not a type"}))
-assertThrows(() => T.object("not an object"))
+assertThrows(() => T.object({ a: "not a type" }));
+assertThrows(() => T.object("not an object"));
 
 t = T.map(T.regex(/^a+$/), T.choice(1, 2));
 t.validate({});
@@ -60,3 +60,5 @@ assertThrows(() => T.map(T.regex(/^a+$/), { validate: 1 }));
 assertThrows(() => T.map(T.regex(/^a+$/), "abc"));
 assertThrows(() => T.map("abc", T.choice(1, 2)));
 assertThrows(() => T.map());
+
+module.exports = Promise.resolve();

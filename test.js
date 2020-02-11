@@ -1,25 +1,29 @@
 "use strict";
 
-// TODO show failiing tests at end
-// TODO await test result from one file before moving onto the next
-
 const { promisify } = require("./asyncHelpers.js");
 const fs = require("fs");
 
-const getFiles = async path =>
-  promisify(callback => fs.readdir(path, callback));
+const getFilesInDir = async dir =>
+  promisify(callback => fs.readdir(dir, callback));
 
-const getTestFiles = async path => {
-  const files = await getFiles(path);
-  return files.filter(fileName => fileName.endsWith("Test.js"))
-}
+const getTestFilesInDir = async dir => {
+  const files = await getFilesInDir(dir);
+  return files
+    .filter(fileName => fileName.endsWith("Test.js"))
+    .map(fileName => `${dir}/${fileName}`);
+};
 
-getTestFiles(__dirname).then(fileNames => {
-  for (const fileName of fileNames) {
-    // TODO make these return async test functions
-    require(`./${fileName}`);
+const getTestFiles = async () => {
+  const paths = await getTestFilesInDir(__dirname);
+  paths.push(__dirname + "/main/orderTest.js");
+  return paths;
+};
+
+getTestFiles().then(async filePaths => {
+  console.log("Testing files:");
+  for (const filePath of filePaths) {
+    console.log(filePath);
+    await require(filePath);
   }
-})
-
-// TODO make this return an async test function
-require("./main/orderTest.js");
+  console.log("All tests passed!");
+});

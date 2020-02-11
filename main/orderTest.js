@@ -14,3 +14,5 @@ assert(
 );
 
 // TODO test multiple additions, changing the spice level, and deleting a line
+
+module.exports = Promise.resolve();

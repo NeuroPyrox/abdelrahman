@@ -13,7 +13,7 @@ const { Table } = require("./database.js");
 // We don't test trivial type errors here because typeTest.js handles that
 // and it'd be testing whether a dependency works
 
-(async () => {
+const test = async () => {
   const table = new Table("test", { x: "INT", y: "TEXT" });
 
   // Ways that you can screw up table initialization
@@ -56,9 +56,11 @@ const { Table } = require("./database.js");
 
   // Ways you can screw up setAll's input
   const wrongColumnType = [{ x: 1, y: 2 }];
-  const missingColumn = [{x: 1}]
-  const extraColumn = [{x: 1, y: "abc", z: true}]
+  const missingColumn = [{ x: 1 }];
+  const extraColumn = [{ x: 1, y: "abc", z: true }];
   await assertRejects(table.setAll(wrongColumnType));
   await assertRejects(table.setAll(missingColumn));
   await assertRejects(table.setAll(extraColumn));
-})();
+};
+
+module.exports = test();
