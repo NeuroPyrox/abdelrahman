@@ -18,6 +18,7 @@ const assertThrows = testFunction => {
   throw Error("Didn't throw");
 };
 
+// TODO move to asyncHelpers.js
 const assertRejects = async promise => {
   const withStackTrace = Error("Didn't reject");
   try {

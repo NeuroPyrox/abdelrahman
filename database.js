@@ -92,6 +92,7 @@ class UnsafeTable {
     try {
       await sqlite3Async.run(`DROP TABLE ${this.name}`);
     } catch (err) {
+      // TODO I get a "database table is locked" error here when I restart the server too quickly. Investigate further
       throw Error(`Could not drop ${this.name}:\n${err}`);
     }
   }

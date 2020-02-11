@@ -1,5 +1,8 @@
 "use strict";
 
+// TODO once I move a bunch of functions to this file, make sure they all take promises as args instead of async functions
+// TODO rename to promiseHelpers.js
+
 const promiseMultiple = executor => {
   return new Promise(function(resolve, reject) {
     try {
