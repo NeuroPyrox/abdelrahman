@@ -49,3 +49,8 @@ assertLines(dish, [
 
 dish = dish.remove("mild");
 assertLines(dish, [{ spiceLevel: "hot", quantity: 2 }]);
+
+dish = new Dish()
+assert(dish.isEmpty())
+dish = dish.add()
+assert(!dish.isEmpty())

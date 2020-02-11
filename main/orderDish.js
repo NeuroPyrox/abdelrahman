@@ -39,6 +39,10 @@ class Dish {
     return clone;
   }
   
+  isEmpty() {
+    return this.notSpicy === 0 && this.mild === 0 && this.hot === 0;
+  }
+  
   clone() {
     return new Dish(this.notSpicy, this.mild, this.hot);
   }

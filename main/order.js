@@ -34,7 +34,23 @@ class Order {
     if (index === -1) {
       throw Error();
     }
-    this.dishes[index].dish = this.dishes[index].dish.changeSpiceLevel(oldLevel, newLevel);
+    this.dishes[index].dish = this.dishes[index].dish.changeSpiceLevel(
+      oldLevel,
+      newLevel
+    );
+  }
+
+  remove(dishName, spiceLevel) {
+    const index = this.dishes.findIndex(dish => dish.dishName === dishName);
+    if (index === -1) {
+      throw Error();
+    }
+    const newDish = this.dishes[index].dish.remove(spiceLevel);
+    if (newDish.isEmpty()) {
+      this.dishes.splice(index, 1);
+      return;
+    }
+    this.dishes[index].dish = newDish;
   }
 }
 

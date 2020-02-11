@@ -37,4 +37,16 @@ assertLines(order, [
   { dishName: "Butter Chicken", spiceLevel: "notSpicy", quantity: 1 }
 ]);
 
-// TODO test deleting a line
+order.add("Sweet 'n Sour Chicken");
+order.remove("Sweet 'n Sour Chicken", "mild");
+assertLines(order, [
+  { dishName: "Sweet 'n Sour Chicken", spiceLevel: "notSpicy", quantity: 1 },
+  { dishName: "Butter Chicken", spiceLevel: "notSpicy", quantity: 1 }
+]);
+
+order.remove("Sweet 'n Sour Chicken", "notSpicy");
+order.add("Sweet 'n Sour Chicken");
+assertLines(order, [
+  { dishName: "Butter Chicken", spiceLevel: "notSpicy", quantity: 1 },
+  { dishName: "Sweet 'n Sour Chicken", spiceLevel: "notSpicy", quantity: 1 }
+]);
