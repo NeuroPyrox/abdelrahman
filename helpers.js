@@ -151,17 +151,6 @@ const arraysOfObjectsAreEqual = (a, b) => {
   return a.every((item, i) => objectsAreEqual(b[i], item));
 };
 
-const test = async (name, testFunction) => {
-  try {
-    await testFunction();
-  } catch (err) {
-    console.log("Failed test:", name);
-    console.error(err);
-    return;
-  }
-  console.log("Passed test:", name);
-};
-
 const waitForever = async () => new Promise(_ => {});
 
 const outerResolve = () => {
@@ -205,7 +194,6 @@ module.exports = {
   singlyNestedArraysAreEqual,
   objectsAreEqual,
   arraysOfObjectsAreEqual,
-  test,
   waitForever,
   outerResolve,
   assertResolves,
