@@ -4,9 +4,8 @@ const {
   assert,
   assertThrows,
   assertRejects,
-  isEmptyArray,
-  range,
-  arraysOfObjectsAreEqual
+  deepEqual,
+  range
 } = require("./helpers.js");
 const { Table } = require("./database.js");
 
@@ -38,7 +37,7 @@ const test = async () => {
   // Remember, we defined table at the top of this function
   await table.reset();
   const initialData = await table.getAll();
-  assert(isEmptyArray(initialData));
+  assert(deepEqual(initialData, []));
 
   const setTo = [
     {
@@ -52,7 +51,7 @@ const test = async () => {
   ];
   await table.setAll(setTo);
   const gotten = await table.getAll();
-  assert(arraysOfObjectsAreEqual(setTo, gotten));
+  assert(deepEqual(setTo, gotten));
 
   // Ways you can screw up setAll's input
   const wrongColumnType = [{ x: 1, y: 2 }];

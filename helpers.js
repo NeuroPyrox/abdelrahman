@@ -125,33 +125,6 @@ const catchError = func => {
 
 const range = n => [...Array(n).keys()];
 
-const isEmptyArray = array => Array.isArray(array) && array.length === 0;
-
-const arraysAreEqual = (a, b) => {
-  if (a.length !== b.length) {
-    return false;
-  }
-  return a.every((item, i) => b[i] === item);
-};
-
-const singlyNestedArraysAreEqual = (a, b) => {
-  if (a.length !== b.length) {
-    return false;
-  }
-  return a.every((item, i) => arraysAreEqual(b[i], item));
-};
-
-const objectsAreEqual = (a, b) => {
-  return singlyNestedArraysAreEqual(Object.entries(a), Object.entries(b));
-};
-
-const arraysOfObjectsAreEqual = (a, b) => {
-  if (a.length !== b.length) {
-    return false;
-  }
-  return a.every((item, i) => objectsAreEqual(b[i], item));
-};
-
 const waitForever = async () => new Promise(_ => {});
 
 const outerResolve = () => {
@@ -211,10 +184,6 @@ module.exports = {
   getRejection,
   catchError,
   range,
-  isEmptyArray,
-  singlyNestedArraysAreEqual,
-  objectsAreEqual,
-  arraysOfObjectsAreEqual,
   waitForever,
   outerResolve,
   timeout,

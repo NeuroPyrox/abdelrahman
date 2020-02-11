@@ -1,11 +1,11 @@
 "use strict";
 
 const Order = require("./order.js");
-const { assert, isEmptyArray, deepEqual } = require("../helpers.js");
+const { assert, deepEqual } = require("../helpers.js");
 
 const order = new Order();
 // TODO replace with deepEqual
-assert(isEmptyArray(order.getLines()));
+assert(deepEqual(order.getLines(), []));
 
 order.add("Sweet 'n Sour Chicken");
 assert(
