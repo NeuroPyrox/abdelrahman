@@ -7,7 +7,10 @@ const Order = require("./order.js");
 const { assert, deepEqual } = require("../helpers.js");
 
 const assertLines = (order, lines) =>
-  assert(deepEqual(order.getLines(), lines));
+  assert(
+    deepEqual(order.getLines(), lines),
+    JSON.stringify(order.getLines(), null, 1)
+  );
 
 const order = new Order();
 assertLines(order, []);

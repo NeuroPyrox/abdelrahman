@@ -1,6 +1,6 @@
 "use strict";
 
-// TODO factor out spiceQuantities into a separate class
+const Dish = require("./orderDish.js");
 
 class Order {
   constructor() {
@@ -8,30 +8,25 @@ class Order {
   }
 
   getLines() {
-    const lines = [];
-    for (const {dishName, spiceQuantities} of this.dishes) {
-      for (const spiceLevel of ["notSpicy", "mild", "hot"]) {
-        const quantity = spiceQuantities[spiceLevel];
-        if (quantity) {
-          lines.push({dishName, spiceLevel, quantity})
-        }
+    let lines = [];
+    for (const { dishName, dish } of this.dishes) {
+      const dishLines = dish.getLines();
+      for (const line of dishLines) {
+        line.dishName = dishName;
       }
+      lines = lines.concat(dishLines);
     }
-    return lines
+    return lines;
   }
 
   add(dishName) {
     const index = this.dishes.findIndex(dish => dish.dishName === dishName);
     if (index === -1) {
-      this.dishes.push({dishName, spiceQuantities: {notSpicy: 1}});
-      return;
+      const dish = new Dish().add();
+      this.dishes.push({ dishName, dish });
+    } else {
+      this.dishes[index].dish = this.dishes[index].dish.add();
     }
-    const spiceQuantities = this.dishes[index].spiceQuantities;
-    if (!spiceQuantities.notSpicy) {
-      spiceQuantities.notSpicy = 1;
-      return;
-    }
-    spiceQuantities.notSpicy += 1
   }
 
   changeSpiceLevel(dishName, oldLevel, newLevel) {
@@ -39,17 +34,7 @@ class Order {
     if (index === -1) {
       throw Error();
     }
-    const spiceQuantities = this.dishes[index].spiceQuantities;
-    const oldQuantity = spiceQuantities[oldLevel];
-    if (!oldQuantity) {
-      throw Error();
-    }
-    spiceQuantities[oldLevel] = 0;
-    if(!spiceQuantities[newLevel]) {
-      spiceQuantities[newLevel] = oldQuantity;
-      return;
-    }
-    spiceQuantities[newLevel] += oldQuantity;
+    this.dishes[index].dish = this.dishes[index].dish.changeSpiceLevel(oldLevel, newLevel);
   }
 }
 

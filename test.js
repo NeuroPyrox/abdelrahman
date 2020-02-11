@@ -15,8 +15,7 @@ const getTestFilesInDir = async dir => {
 
 const getTestFiles = async () => {
   const paths = await getTestFilesInDir(__dirname);
-  paths.push(__dirname + "/main/orderTest.js");
-  return paths;
+  return paths.concat(await getTestFilesInDir(__dirname + "/main"));
 };
 
 getTestFiles().then(async filePaths => {
