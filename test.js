@@ -7,5 +7,7 @@
 require("./databaseTest.js");
 require("./mutexTest.js");
 require("./typeTest.js");
+require("./main/orderTest.js");
+require("./deepEqualTest.js");
 
 console.log("done testing");

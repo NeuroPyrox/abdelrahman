@@ -1,5 +1,7 @@
 "use strict";
 
+// TODO upload this as a separate module to GitHub
+
 const {assert} = require("./helpers.js");
 
 class Mutex {

@@ -181,6 +181,10 @@ const assertResolves = (promise, timeout) => {
   ]);
 };
 
+const deepEqual = (a, b) => {
+  return a.length === b.length
+}
+
 module.exports = {
   assert,
   assertThrows,
@@ -204,5 +208,6 @@ module.exports = {
   test,
   waitForever,
   outerResolve,
-  assertResolves
+  assertResolves,
+  deepEqual
 };
