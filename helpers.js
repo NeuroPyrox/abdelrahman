@@ -173,7 +173,26 @@ const timeout = (promise, milliseconds) => {
 };
 
 const deepEqual = (a, b) => {
-  return a.length === b.length
+  switch (typeof a) {
+    case "number":
+      return a === b;
+    case "string":
+      return a === b;
+    case "boolean":
+      return a === b;
+    case "object":
+      if (countKeys(a) !== countKeys(b)) {
+        return false;
+      }
+      for(const key of Object.keys(a)) {
+        if (!deepEqual(a[key], b[key])) {
+          return false;
+        }
+      }
+      return true;
+    default:
+      throw Error("unsupported type")
+  }
 }
 
 module.exports = {

@@ -7,6 +7,7 @@ const XButton = require("../shared/xButton.jsx");
 const Menu = require("./menu.jsx");
 require("./entry.css");
 
+// Make it so when Menu clicks a dish, it goes into the order
 ReactDOM.render(
   <div>
     <Menu />

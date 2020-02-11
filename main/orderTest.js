@@ -4,10 +4,12 @@ const Order = require("./order.js");
 const { assert, isEmptyArray, deepEqual } = require("../helpers.js");
 
 const order = new Order();
+// TODO replace with deepEqual
 assert(isEmptyArray(order.getLines()));
 
 order.add("Sweet 'n Sour Chicken");
 assert(
+  // TODO test deepEqual
   deepEqual(order.getLines(), [
     { dishName: "Sweet 'n Sour Chicken", quantity: 1, spiceLevel: "notSpicy" }
   ])
