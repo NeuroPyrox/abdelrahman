@@ -4,7 +4,7 @@ const {
   assert,
   waitForever,
   outerResolve,
-  assertResolves
+  timeout
 } = require("./helpers.js");
 const Mutex = require("./mutex.js");
 
@@ -16,7 +16,7 @@ const test = async () => {
   const derivedPromise = mutex.do(() => promise);
   // Unlocks the mutex
   resolve();
-  await assertResolves(derivedPromise, 200); // TODO rename assertResolves to timeout
+  await timeout(derivedPromise, 200); // TODO rename assertResolves to timeout
   
   const [promise1, resolve1] = outerResolve();
   const [promise2, resolve2] = outerResolve();
@@ -26,7 +26,7 @@ const test = async () => {
   // TODO assert that promise2 is blocked
   // Unlocks the mutex, allowing resolve2 to run
   resolve1();
-  await assertResolves(promise2, 200);
+  await timeout(promise2, 200);
   
   mutex.do(waitForever);
   // TODO use a timeout for this assertion

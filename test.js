@@ -16,8 +16,10 @@ const getTestFiles = async path => {
 
 getTestFiles(__dirname).then(fileNames => {
   for (const fileName of fileNames) {
+    // TODO make these return async test functions
     require(`./${fileName}`);
   }
 })
 
+// TODO make this return an async test function
 require("./main/orderTest.js");

@@ -161,11 +161,12 @@ const outerResolve = () => {
   return [promise, outer];
 };
 
-const assertResolves = (promise, timeout) => {
+// TODO move to async helpers
+const timeout = (promise, milliseconds) => {
   return Promise.race([
     promise,
     new Promise((resolve, reject) => {
-      setTimeout(reject, timeout);
+      setTimeout(reject, milliseconds);
     })
   ]);
 };
@@ -196,6 +197,6 @@ module.exports = {
   arraysOfObjectsAreEqual,
   waitForever,
   outerResolve,
-  assertResolves,
+  timeout,
   deepEqual
 };
