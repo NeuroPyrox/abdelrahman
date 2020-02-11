@@ -23,5 +23,3 @@ assertThrows(() =>deepEqual(() => {}, () => {}))
 assertThrows(() => deepEqual(Symbol(1), Symbol(1)))
 // TODO uncomment when big ints become available
 // assertThrows(deepEqual(1n, 1n))
-
-module.exports = Promise.resolve();

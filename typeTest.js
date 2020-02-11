@@ -60,5 +60,3 @@ assertThrows(() => T.map(T.regex(/^a+$/), { validate: 1 }));
 assertThrows(() => T.map(T.regex(/^a+$/), "abc"));
 assertThrows(() => T.map("abc", T.choice(1, 2)));
 assertThrows(() => T.map());
-
-module.exports = Promise.resolve();
