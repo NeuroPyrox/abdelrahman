@@ -1,0 +1,50 @@
+
+.order {
+  width: 300px;
+}
+
+.lineHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.spiceRadio {
+  display: flex;
+}
+
+.spiceRadio > div {
+  border-radius: 15px;
+  padding: 3px;
+  margin: 3px;
+}
+
+.spiceRadio > .notSpicy {
+  --spiceColor: lightgreen;
+}
+
+.spiceRadio > .mild {
+  --spiceColor: khaki;
+}
+
+.spiceRadio > .hot {
+  --spiceColor: lightsalmon;
+}
+
+.spiceRadio > .unselected {
+  background-color: white;
+  border: 5px solid white;
+  cursor: pointer;
+}
+
+.spiceRadio > .halfSelected {
+  background-color: white;
+  border: 5px solid var(--spiceColor);
+  cursor: pointer;
+}
+
+.spiceRadio > .selected {
+  background-color: var(--spiceColor);
+  border: 5px solid var(--spiceColor);
+  cursor: default;
+}

@@ -1,38 +1,3 @@
 body {
   font-family: "Merienda";
 }
-
-.spiceRadio > input {
-  display: none;
-}
-
-.spiceRadio > label {
-  background-color: white;
-  border: 5px solid white;
-  border-radius: 15px;
-  padding: 3px;
-  margin: 3px;
-  cursor: pointer;
-}
-
-.spiceRadio > input[value="notSpicy"] + label {
-  --spiceColor: lightgreen;
-}
-
-.spiceRadio > input[value="mild"] + label {
-  --spiceColor: khaki;
-}
-
-.spiceRadio > input[value="hot"] + label {
-  --spiceColor: lightsalmon;
-}
-
-.spiceRadio > label:hover {
-  border: 5px solid var(--spiceColor);
-}
-
-.spiceRadio > input:checked + label {
-  background-color: var(--spiceColor);
-  border: 5px solid var(--spiceColor);
-  cursor: default;
-}

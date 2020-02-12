@@ -1,28 +1,58 @@
 "use strict";
 
 const React = require("react");
+const Button = require("../shared/button.jsx");
 const XButton = require("../shared/xButton.jsx");
+require("./order.css");
 
-const SpiceRadio = ({ selected }) => (
+const spiceOptionStyles = (spiceLevel, selectedLevel) => {
+  if (spiceLevel === selectedLevel) {
+    return [
+      spiceLevel + " selected",
+      spiceLevel + " selected",
+      spiceLevel + " selected"
+    ];
+  } else {
+    return [
+      spiceLevel + " unselected",
+      spiceLevel + " halfSelected",
+      spiceLevel + " selected"
+    ];
+  }
+};
+
+// Not really a radio. It just acts like one
+const SpiceRadio = ({ selectedLevel }) => (
   <div className="spiceRadio">
     {[["notSpicy", "Not Spicy"], ["mild", "Mild"], ["hot", "Hot"]].map(
-      ([spiceLevel, text]) => (
-        <p
-          key={spiceLevel}
-          className={spiceLevel === selected ? spiceLevel : ""}
-        >
-          {text}
-        </p>
-      )
+      ([spiceLevel, text]) => {
+        const [defaultStyle, hoverStyle, clickStyle] = spiceOptionStyles(
+          spiceLevel,
+          selectedLevel
+        );
+        return (
+          <Button
+            key={spiceLevel}
+            defaultStyle={defaultStyle}
+            hoverStyle={hoverStyle}
+            clickStyle={clickStyle}
+            onClick={() => {}}
+          >
+            {text}
+          </Button>
+        );
+      }
     )}
   </div>
 );
 
 const Line = ({ dishName, quantity, spiceLevel }) => (
   <div>
-    <h4>{`${quantity}x ${dishName}`}</h4>
-    <XButton />
-    {spiceLevel ? <SpiceRadio selected={spiceLevel} /> : ""}
+    <div className="lineHeader">
+      <h4>{`${quantity}x ${dishName}`}</h4>
+      <XButton />
+    </div>
+    {spiceLevel ? <SpiceRadio selectedLevel={spiceLevel} /> : ""}
   </div>
 );
 
@@ -40,7 +70,7 @@ const DishOrder = ({ dishName, lines }) => (
 );
 
 const Order = ({ dishOrders }) => (
-  <div>
+  <div className="order">
     {dishOrders.map(({ dishName, lines }) => (
       <DishOrder key={dishName} dishName={dishName} lines={lines} />
     ))}
@@ -48,3 +78,4 @@ const Order = ({ dishOrders }) => (
 );
 
 module.exports = Order;
+;
