@@ -12,10 +12,6 @@ class Menu extends React.Component {
     this.state = { menu: [] };
     api
       .loadMenu()
-    .then(menu => {
-      console.log(menu);
-      return menu
-    })
       .then(menu => this.setState({ menu: menu }))
       .catch(foundBug);
   }
