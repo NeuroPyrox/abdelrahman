@@ -4,8 +4,8 @@
 
 // I'm leaving out the immutibility tests because I think the code speaks for itself on immutibility
 
-const Dish = require("./orderDish.js");
-const { assert, deepEqual } = require("../helpers.js");
+const Dish = require("./dish.js");
+const { assert, deepEqual } = require("../../helpers.js");
 
 const assertLines = (order, lines) =>
   assert(deepEqual(order.getLines(), lines), JSON.stringify(order.getLines(), null, 1));

@@ -1,6 +1,6 @@
 "use strict";
 
-const Dish = require("./orderDish.js");
+const Dish = require("./dish.js");
 
 class Order {
   constructor(dishes = []) {

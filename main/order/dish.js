@@ -1,7 +1,5 @@
 "use strict";
 
-// TODO move this file to its own folder to avoid naming overlap with dish.jsx
-
 class Dish {
   constructor(notSpicy = 0, mild = 0, hot = 0) {
     this.notSpicy = notSpicy;

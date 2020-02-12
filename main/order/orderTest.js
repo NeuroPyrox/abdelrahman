@@ -3,7 +3,7 @@
 // TODO make the spice level optional
 
 const Order = require("./order.js");
-const { assert, deepEqual } = require("../helpers.js");
+const { assert, deepEqual } = require("../../helpers.js");
 
 const assertLines = (order, lines) =>
   assert(
