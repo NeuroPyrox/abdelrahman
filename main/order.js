@@ -3,8 +3,8 @@
 const Dish = require("./orderDish.js");
 
 class Order {
-  constructor() {
-    this.dishes = [];
+  constructor(dishes = []) {
+    this.dishes = dishes;
   }
 
   getLines() {
@@ -20,37 +20,58 @@ class Order {
   }
 
   add(dishName) {
-    const index = this.dishes.findIndex(dish => dish.dishName === dishName);
+    const clone = this.clone();
+    const index = clone.findDish(dishName);
     if (index === -1) {
-      const dish = new Dish().add();
-      this.dishes.push({ dishName, dish });
+      clone.dishes.push({ dishName, dish: new Dish().add() });
     } else {
-      this.dishes[index].dish = this.dishes[index].dish.add();
+      clone.setDishAt(index, this.getDishAt(index).add());
     }
+    return clone
   }
 
   changeSpiceLevel(dishName, oldLevel, newLevel) {
-    const index = this.dishes.findIndex(dish => dish.dishName === dishName);
+    const clone = this.clone();
+    const index = this.findDish(dishName);
     if (index === -1) {
       throw Error();
     }
-    this.dishes[index].dish = this.dishes[index].dish.changeSpiceLevel(
-      oldLevel,
-      newLevel
+    clone.setDishAt(
+      index,
+      this.getDishAt(index).changeSpiceLevel(oldLevel, newLevel)
     );
+    return clone
   }
 
   remove(dishName, spiceLevel) {
-    const index = this.dishes.findIndex(dish => dish.dishName === dishName);
+    const clone = this.clone();
+    const index = clone.findDish(dishName);
     if (index === -1) {
       throw Error();
     }
-    const newDish = this.dishes[index].dish.remove(spiceLevel);
+    const newDish = this.getDishAt(index).remove(spiceLevel);
     if (newDish.isEmpty()) {
-      this.dishes.splice(index, 1);
-      return;
+      clone.dishes.splice(index, 1);
+    } else {
+      clone.setDishAt(index, newDish);
     }
-    this.dishes[index].dish = newDish;
+    return clone;
+  }
+
+  clone() {
+    return new Order(this.dishes.slice());
+  }
+
+  findDish(dishName) {
+    return this.dishes.findIndex(dish => dish.dishName === dishName);
+  }
+
+  getDishAt(index) {
+    return this.dishes[index].dish;
+  }
+
+  setDishAt(index, dish) {
+    this.dishes[index].dish = dish;
   }
 }
 
