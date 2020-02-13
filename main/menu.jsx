@@ -21,7 +21,12 @@ class Menu extends React.Component {
     return (
       <div className="menu">
         {this.state.menu.map(({ imageUrl, dishName }) => (
-          <Dish key={dishName} image={imageUrl} dishName={dishName} />
+          <Dish
+            key={dishName}
+            image={imageUrl}
+            dishName={dishName}
+            onClick={() => this.props.onClickDish(dishName)}
+          />
         ))}
       </div>
     );

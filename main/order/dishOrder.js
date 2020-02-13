@@ -1,16 +1,20 @@
 "use strict";
 
 class DishOrder {
-  constructor(dishName, quantity) {
+  constructor(dishName, quantity=0) {
     this.dishName = dishName;
     this.quantity = quantity;
+  }
+  
+  getDishName() {
+    return this.dishName;
   }
 
   getLines() {
     if (this.quantity === 0) {
       return [];
     }
-    return [{ dishName: this.dishName, quantity: this.quantity }];
+    return [{ quantity: this.quantity }];
   }
 
   add() {

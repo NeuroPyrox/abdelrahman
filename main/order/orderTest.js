@@ -1,137 +1,54 @@
 "use strict";
 
+const Order = require("./order.js");
+const DishOrder = require("./dishOrder.js");
+const SpicyDishOrder = require("./spicyDishOrder.js");
 const Menu = require("./menu.js");
 const { assert, deepEqual } = require("../../helpers.js");
 
-const assertLines = (order, lines) =>
+const assertDishOrders = (order, dishOrders) =>
   assert(
-    deepEqual(order.getLines(), lines),
-    JSON.stringify(order.getLines(), null, 1)
+    deepEqual(order.getDishOrders(), dishOrders),
+    JSON.stringify(order.getDishOrders(), null, 1)
   );
 
+// Setup
 const menu = new Menu({
   "Sweet 'n Sour Chicken": { spicy: false },
   "Butter Chicken": { spicy: true }
 });
+const sweetNSourChicken = new DishOrder("Sweet 'n Sour Chicken");
+const butterChicken = new SpicyDishOrder("Butter Chicken");
 
-const order = menu.createOrder();
+// Construction
+const order = new Order(menu);
+assertDishOrders(order, []);
 
-assertLines(order, []);
+// Add
+assertDishOrders(order.add("Sweet 'n Sour Chicken"), [sweetNSourChicken.add()]);
+assertDishOrders(order.add("Sweet 'n Sour Chicken").add("Butter Chicken"), [
+  sweetNSourChicken.add(),
+  butterChicken.add()
+]);
 
-assertLines(order.add("Sweet 'n Sour Chicken"), [
-  { dishName: "Sweet 'n Sour Chicken", quantity: 1 }
-]);
-assertLines(order.add("Sweet 'n Sour Chicken").add("Sweet 'n Sour Chicken"), [
-  { dishName: "Sweet 'n Sour Chicken", quantity: 2 }
-]);
-assertLines(order.add("Butter Chicken"), [
-  { dishName: "Butter Chicken", spiceLevel: "notSpicy", quantity: 1 }
-]);
-assertLines(order.add("Butter Chicken").add("Butter Chicken"), [
-  { dishName: "Butter Chicken", spiceLevel: "notSpicy", quantity: 2 }
-]);
-assertLines(order.add("Butter Chicken").add("Sweet 'n Sour Chicken"), [
-  { dishName: "Butter Chicken", spiceLevel: "notSpicy", quantity: 1 },
-  { dishName: "Sweet 'n Sour Chicken", quantity: 1 }
-]);
-assertLines(order.add("Sweet 'n Sour Chicken").add("Butter Chicken"), [
-  { dishName: "Sweet 'n Sour Chicken", quantity: 1 },
-  { dishName: "Butter Chicken", spiceLevel: "notSpicy", quantity: 1 }
-]);
-assertLines(
+// Change Spice Level
+assertDishOrders(
   order
     .add("Butter Chicken")
     .changeSpiceLevel("Butter Chicken", "notSpicy", "mild"),
-  [
-    {
-      dishName: "Butter Chicken",
-      spiceLevel: "mild",
-      quantity: 1
-    }
-  ]
+  [butterChicken.add().changeSpiceLevel("notSpicy", "mild")]
 );
-assertLines(
-  order
-    .add("Butter Chicken")
-    .changeSpiceLevel("Butter Chicken", "notSpicy", "mild")
-    .add("Butter Chicken")
-    .changeSpiceLevel("Butter Chicken", "notSpicy", "mild"),
-  [
-    {
-      dishName: "Butter Chicken",
-      spiceLevel: "mild",
-      quantity: 2
-    }
-  ]
+
+// Remove
+assertDishOrders(
+  order.add("Sweet 'n Sour Chicken").remove("Sweet 'n Sour Chicken"),
+  []
 );
-assertLines(
-  order
-    .add("Butter Chicken")
-    .add("Butter Chicken")
-    .changeSpiceLevel("Butter Chicken", "notSpicy", "mild"),
-  [
-    {
-      dishName: "Butter Chicken",
-      spiceLevel: "mild",
-      quantity: 2
-    }
-  ]
-);
-assertLines(
-  order
-    .add("Butter Chicken")
-    .changeSpiceLevel("Butter Chicken", "notSpicy", "mild")
-    .add("Butter Chicken")
-    .changeSpiceLevel("Butter Chicken", "notSpicy", "hot")
-    .add("Butter Chicken"),
-  [
-    {
-      dishName: "Butter Chicken",
-      spiceLevel: "notSpicy",
-      quantity: 1
-    },
-    {
-      dishName: "Butter Chicken",
-      spiceLevel: "mild",
-      quantity: 1
-    },
-    {
-      dishName: "Butter Chicken",
-      spiceLevel: "hot",
-      quantity: 1
-    }
-  ]
-);
-assertLines(
-  order
-    .add("Butter Chicken")
-    .changeSpiceLevel("Butter Chicken", "notSpicy", "mild")
-    .add("Butter Chicken")
-    .remove("Butter Chicken", "notSpicy"),
-  [
-    {
-      dishName: "Butter Chicken",
-      spiceLevel: "mild",
-      quantity: 1
-    }
-  ]
-);
-assertLines(order.add("Sweet 'n Sour Chicken").remove("Sweet 'n Sour Chicken"), []);
-assertLines(
+assertDishOrders(
   order
     .add("Butter Chicken")
     .add("Sweet 'n Sour Chicken")
     .remove("Butter Chicken", "notSpicy")
     .add("Butter Chicken"),
-  [
-    {
-      dishName: "Sweet 'n Sour Chicken",
-      quantity: 1
-    },
-    {
-      dishName: "Butter Chicken",
-      spiceLevel: "notSpicy",
-      quantity: 1
-    }
-  ]
+  [sweetNSourChicken.add(), butterChicken.add()]
 );
