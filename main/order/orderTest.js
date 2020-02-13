@@ -17,9 +17,7 @@ const menu = new Menu({
   "Sweet 'n Sour Chicken": { spicy: false },
   "Butter Chicken": { spicy: true }
 });
-const sweetNSourChicken = new DishOrder("Sweet 'n Sour Chicken", {
-  spicy: false
-});
+const sweetNSourChicken = new DishOrder("Sweet 'n Sour Chicken");
 const butterChicken = new SpicyDishOrder("Butter Chicken");
 
 // Construction
@@ -52,5 +50,5 @@ assertDishOrders(
     .add("Sweet 'n Sour Chicken")
     .remove("Butter Chicken", "notSpicy")
     .add("Butter Chicken"),
-  [butterChicken.add(), sweetNSourChicken.add()]
+  [sweetNSourChicken.add(), butterChicken.add()]
 );

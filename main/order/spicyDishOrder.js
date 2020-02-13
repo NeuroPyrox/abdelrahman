@@ -1,7 +1,10 @@
 "use strict";
 
 class SpicyDishOrder {
-  constructor(dishName, spiceLevelQuantities) {
+  constructor(
+    dishName,
+    spiceLevelQuantities = { notSpicy: 0, mild: 0, hot: 0 }
+  ) {
     this.dishName = dishName;
     this.spiceLevelQuantities = spiceLevelQuantities;
   }
@@ -9,7 +12,6 @@ class SpicyDishOrder {
   getLines() {
     return ["notSpicy", "mild", "hot"]
       .map(spiceLevel => ({
-        dishName: this.dishName,
         spiceLevel,
         quantity: this.spiceLevelQuantities[spiceLevel]
       }))
@@ -37,7 +39,9 @@ class SpicyDishOrder {
   }
 
   isEmpty() {
-    return Object.values(this.spiceLevelQuantities).every(quantity => quantity === 0);
+    return Object.values(this.spiceLevelQuantities).every(
+      quantity => quantity === 0
+    );
   }
 
   clone() {

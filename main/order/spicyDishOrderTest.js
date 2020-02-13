@@ -62,7 +62,7 @@ assertLines(
 assertLines(
   butterChicken
     .add().add()
-    .remove(),
+    .remove("notSpicy"),
   []
 );
 

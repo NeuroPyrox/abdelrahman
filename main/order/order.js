@@ -1,25 +1,22 @@
 "use strict";
 
 class Order {
-  constructor(menu, order) {
+  constructor(menu, dishOrders=[]) {
     this.menu = menu;
-    this.order = order;
+    this.dishOrders = dishOrders;
   }
 
-  getLines() {
-    const lines = [].concat(
-      ...this.order.map(dishOrder => dishOrder.getLines())
-    );
-    return lines;
+  getDishOrders() {
+    return this.dishOrders.slice();
   }
 
   add(dishName) {
     const clone = this.clone();
     const index = clone.findDishOrder(dishName);
     if (index === -1) {
-      clone.order.push(clone.menu.createDishOrder(dishName));
+      clone.dishOrders.push(clone.menu.createDishOrder(dishName));
     } else {
-      clone.order[index] = this.order[index].add();
+      clone.dishOrders[index] = this.dishOrders[index].add();
     }
     return clone;
   }
@@ -30,7 +27,7 @@ class Order {
     if (index === -1) {
       throw Error();
     }
-    clone.order[index] = this.order[index].changeSpiceLevel(oldLevel, newLevel);
+    clone.dishOrders[index] = this.dishOrders[index].changeSpiceLevel(oldLevel, newLevel);
     return clone;
   }
 
@@ -41,21 +38,21 @@ class Order {
       throw Error();
     }
     // spiceLevel is ignored in dishOrder.remove but not spicyDishOrder.remove
-    const dishOrder = this.order[index].remove(spiceLevel);
+    const dishOrder = this.dishOrders[index].remove(spiceLevel);
     if (dishOrder.isEmpty()) {
-      clone.order.splice(index, 1);
+      clone.dishOrders.splice(index, 1);
     } else {
-      clone.order[index] = dishOrder;
+      clone.dishOrders[index] = dishOrder;
     }
     return clone;
   }
 
   clone() {
-    return new Order(this.menu, this.order.slice());
+    return new Order(this.menu, this.dishOrders.slice());
   }
 
   findDishOrder(dishName) {
-    return this.order.findIndex(dishOrder => dishOrder.dishName === dishName);
+    return this.dishOrders.findIndex(dishOrder => dishOrder.dishName === dishName);
   }
 }
 
