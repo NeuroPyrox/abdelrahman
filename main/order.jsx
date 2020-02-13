@@ -50,6 +50,7 @@ const SpiceRadio = ({ selectedLevel }) => (
   <div className="spiceRadio">
     {["notSpicy", "mild", "hot"].map(spiceLevel => (
       <SpiceOption
+        key={spiceLevel}
         spiceLevel={spiceLevel}
         selected={selectedLevel === spiceLevel}
       />
