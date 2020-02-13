@@ -2,6 +2,7 @@
 
 const Order = require("./order.js");
 const DishOrder = require("./dishOrder.js");
+const SpicyDishOrder = require("./spicyDishOrder.js");
 const Menu = require("./menu.js");
 const { assert, deepEqual } = require("../../helpers.js");
 
@@ -19,7 +20,7 @@ const menu = new Menu({
 const sweetNSourChicken = new DishOrder("Sweet 'n Sour Chicken", {
   spicy: false
 });
-const butterChicken = new DishOrder("Butter Chicken", { spicy: true });
+const butterChicken = new SpicyDishOrder("Butter Chicken");
 
 // Construction
 const order = new Order(menu);
