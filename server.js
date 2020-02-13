@@ -50,9 +50,9 @@ const notifyAdmin = asyncHandler(async (req, res) => {
 // Use helper functions to interface with Expressjs
 // because otherwise, the middleware would make it unacceptably verbose
 startServer({
-  "/": services.staticFile("/main/main.html"),
+  "/": services.staticFile("/main/index.html"),
   "/admin/": services.redirect("/admin"),
-  "/admin": services.staticFile("/admin/admin.html"),
+  "/admin": services.staticFile("/admin/index.html"),
 
   "/main/bundle.js": services.staticFile("/main/bundle.js"),
   "/main/style.css": services.staticFile("/main/style.css"),
