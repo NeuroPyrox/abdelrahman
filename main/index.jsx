@@ -28,10 +28,18 @@ class Index extends React.Component {
     };
   }
 
+  modifyOrder(modify) {
+    this.setState({ order: modify(this.state.order) });
+  }
+
   render() {
     return (
       <div>
-        <MenuView onClickDish={dishName => alert(dishName)} />
+        <MenuView
+          onClickDish={dishName =>
+            this.modifyOrder(order => order.add(dishName))
+          }
+        />
         <OrderView dishOrders={this.state.order.getDishOrders()} />
       </div>
     );
