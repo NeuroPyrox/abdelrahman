@@ -50,7 +50,7 @@ assertLines(
   ]
 );
 
-// Remove
+// Remove Line
 assertLines(
   butterChicken
     .add()
