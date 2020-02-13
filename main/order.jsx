@@ -27,7 +27,7 @@ const formatSpiceLevel = {
   hot: "Hot"
 };
 
-const SpiceOption = ({ spiceLevel, selected }) => {
+const SpiceOption = ({ spiceLevel, selected, onSelect }) => {
   const [defaultStyle, hoverStyle, clickStyle] = spiceOptionStyles(
     spiceLevel,
     selected
@@ -38,7 +38,7 @@ const SpiceOption = ({ spiceLevel, selected }) => {
       defaultStyle={defaultStyle}
       hoverStyle={hoverStyle}
       clickStyle={clickStyle}
-      onClick={() => {}}
+      onClick={onSelect}
     >
       {formatSpiceLevel[spiceLevel]}
     </Button>
@@ -46,29 +46,40 @@ const SpiceOption = ({ spiceLevel, selected }) => {
 };
 
 // Not really a radio. It just acts like one
-const SpiceRadio = ({ selectedLevel }) => (
+const SpiceRadio = ({ selectedLevel, onSelect }) => (
   <div className="spiceRadio">
     {["notSpicy", "mild", "hot"].map(spiceLevel => (
       <SpiceOption
         key={spiceLevel}
         spiceLevel={spiceLevel}
         selected={selectedLevel === spiceLevel}
+        onSelect={() => onSelect(spiceLevel)}
       />
     ))}
   </div>
 );
 
-const Line = ({ dishName, quantity, spiceLevel, onRemove }) => (
+const Line = ({
+  dishName,
+  quantity,
+  spiceLevel,
+  onRemove,
+  onChangeSpiceLevel
+}) => (
   <div>
     <div className="lineHeader">
       <h4>{`${quantity}x ${dishName}`}</h4>
       <XButton onClick={onRemove} />
     </div>
-    {spiceLevel ? <SpiceRadio selectedLevel={spiceLevel} /> : ""}
+    {spiceLevel ? (
+      <SpiceRadio selectedLevel={spiceLevel} onSelect={onChangeSpiceLevel} />
+    ) : (
+      ""
+    )}
   </div>
 );
 
-const DishOrder = ({ dishName, lines, onRemoveLine }) => (
+const DishOrder = ({ dishName, lines, onRemoveLine, onChangeSpiceLevel }) => (
   <div>
     {lines.map(({ quantity, spiceLevel }) => (
       <Line
@@ -83,12 +94,15 @@ const DishOrder = ({ dishName, lines, onRemoveLine }) => (
             onRemoveLine();
           }
         }}
+        onChangeSpiceLevel={newLevel =>
+          onChangeSpiceLevel(spiceLevel, newLevel)
+        }
       />
     ))}
   </div>
 );
 
-const Order = ({ dishOrders, onRemoveLine }) => (
+const Order = ({ dishOrders, onRemoveLine, onChangeSpiceLevel }) => (
   <div className="order">
     {dishOrders.map(dishOrder => (
       <DishOrder
@@ -97,6 +111,9 @@ const Order = ({ dishOrders, onRemoveLine }) => (
         lines={dishOrder.getLines()}
         onRemoveLine={(spiceLevel = null) =>
           onRemoveLine(dishOrder.getDishName(), spiceLevel)
+        }
+        onChangeSpiceLevel={(oldLevel, newLevel) =>
+          onChangeSpiceLevel(dishOrder.getDishName(), oldLevel, newLevel)
         }
       />
     ))}

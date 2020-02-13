@@ -38,11 +38,15 @@ class Index extends React.Component {
           onRemoveLine={(dishName, spiceLevel = null) =>
             this.modifyOrder(order => order.removeLine(dishName, spiceLevel))
           }
+          onChangeSpiceLevel={(dishName, oldLevel, newLevel) =>
+            this.modifyOrder(order =>
+              order.changeSpiceLevel(dishName, oldLevel, newLevel)
+            )
+          }
         />
       </div>
     );
   }
 }
 
-// Make it so when Menu clicks a dish, it goes into the order
 ReactDOM.render(<Index />, document.getElementById("main"));
