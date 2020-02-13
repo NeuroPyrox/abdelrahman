@@ -2,8 +2,9 @@
 
 const ReactDOM = require("react-dom");
 const React = require("react");
-const Menu = require("./order/menu.js")
+const Menu = require("./order/menu.js");
 const MenuView = require("./menu.jsx");
+const Order = require("./order/order.js");
 const OrderView = require("./order.jsx");
 require("./index.css");
 
@@ -16,8 +17,7 @@ class Index extends React.Component {
       "Butter Chicken": { spicy: true }
     });
     this.state = {
-      order: menu
-        .createOrder()
+      order: new Order(menu)
         .add("Sweet 'n Sour Chicken")
         .add("Butter Chicken")
         .add("Butter Chicken")

@@ -83,8 +83,8 @@ const DishOrder = ({ dishName, lines }) => (
 
 const Order = ({ dishOrders }) => (
   <div className="order">
-    {dishOrders.map(({ dishName, lines }) => (
-      <DishOrder key={dishName} dishName={dishName} lines={lines} />
+    {dishOrders.map(dishOrder => (
+      <DishOrder key={dishOrder.getDishName()} dishName={dishOrder.getDishName()} lines={dishOrder.getLines()} />
     ))}
   </div>
 );

@@ -5,6 +5,10 @@ class DishOrder {
     this.dishName = dishName;
     this.quantity = quantity;
   }
+  
+  getDishName() {
+    return this.dishName;
+  }
 
   getLines() {
     if (this.quantity === 0) {

@@ -8,6 +8,10 @@ class SpicyDishOrder {
     this.dishName = dishName;
     this.spiceLevelQuantities = spiceLevelQuantities;
   }
+  
+  getDishName() {
+    return this.dishName;
+  }
 
   getLines() {
     return ["notSpicy", "mild", "hot"]
