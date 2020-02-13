@@ -36,7 +36,7 @@ class SpicyDishOrder {
     return clone;
   }
 
-  remove(spiceLevel) {
+  removeLine(spiceLevel) {
     const clone = this.clone();
     clone.spiceLevelQuantities[spiceLevel] = 0;
     return clone;

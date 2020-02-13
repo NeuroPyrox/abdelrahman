@@ -21,7 +21,7 @@ assertLines(sweetNSourChicken.add().add(), [{ quantity: 2 }]);
 assertLines(
   sweetNSourChicken
     .add().add()
-    .remove(),
+    .removeLine(),
   []
 );
 

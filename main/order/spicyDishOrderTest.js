@@ -56,13 +56,13 @@ assertLines(
     .add()
     .changeSpiceLevel("notSpicy", "mild")
     .add()
-    .remove("notSpicy"),
+    .removeLine("notSpicy"),
   [{ quantity: 1, spiceLevel: "mild" }]
 );
 assertLines(
   butterChicken
     .add().add()
-    .remove("notSpicy"),
+    .removeLine("notSpicy"),
   []
 );
 

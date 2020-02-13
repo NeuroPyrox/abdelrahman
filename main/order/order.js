@@ -31,14 +31,14 @@ class Order {
     return clone;
   }
 
-  remove(dishName, spiceLevel = undefined) {
+  removeLine(dishName, spiceLevel = null) {
     const clone = this.clone();
     const index = clone.findDishOrder(dishName);
     if (index === -1) {
       throw Error();
     }
     // spiceLevel is ignored in dishOrder.remove but not spicyDishOrder.remove
-    const dishOrder = this.dishOrders[index].remove(spiceLevel);
+    const dishOrder = this.dishOrders[index].removeLine(spiceLevel);
     if (dishOrder.isEmpty()) {
       clone.dishOrders.splice(index, 1);
     } else {

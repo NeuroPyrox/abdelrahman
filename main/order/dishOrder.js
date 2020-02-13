@@ -23,7 +23,7 @@ class DishOrder {
     return clone;
   }
 
-  remove(spiceLevel) {
+  removeLine(spiceLevel) {
     const clone = this.clone();
     clone.quantity = 0;
     return clone;
