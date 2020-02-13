@@ -18,13 +18,6 @@ class Index extends React.Component {
     });
     this.state = {
       order: new Order(menu)
-        .add("Sweet 'n Sour Chicken")
-        .add("Butter Chicken")
-        .add("Butter Chicken")
-        .add("Butter Chicken")
-        .changeSpiceLevel("Butter Chicken", "notSpicy", "mild")
-        .add("Butter Chicken")
-        .add("Butter Chicken")
     };
   }
 
@@ -40,7 +33,12 @@ class Index extends React.Component {
             this.modifyOrder(order => order.add(dishName))
           }
         />
-        <OrderView dishOrders={this.state.order.getDishOrders()} />
+        <OrderView
+          dishOrders={this.state.order.getDishOrders()}
+          onRemoveLine={(dishName, spiceLevel = null) =>
+            this.modifyOrder(order => order.removeLine(dishName, spiceLevel))
+          }
+        />
       </div>
     );
   }

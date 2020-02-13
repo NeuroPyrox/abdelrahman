@@ -58,17 +58,17 @@ const SpiceRadio = ({ selectedLevel }) => (
   </div>
 );
 
-const Line = ({ dishName, quantity, spiceLevel }) => (
+const Line = ({ dishName, quantity, spiceLevel, onRemove }) => (
   <div>
     <div className="lineHeader">
       <h4>{`${quantity}x ${dishName}`}</h4>
-      <XButton />
+      <XButton onClick={onRemove} />
     </div>
     {spiceLevel ? <SpiceRadio selectedLevel={spiceLevel} /> : ""}
   </div>
 );
 
-const DishOrder = ({ dishName, lines }) => (
+const DishOrder = ({ dishName, lines, onRemoveLine }) => (
   <div>
     {lines.map(({ quantity, spiceLevel }) => (
       <Line
@@ -76,18 +76,31 @@ const DishOrder = ({ dishName, lines }) => (
         dishName={dishName}
         quantity={quantity}
         spiceLevel={spiceLevel}
+        onRemove={() => {
+          if (spiceLevel) {
+            onRemoveLine(spiceLevel);
+          } else {
+            onRemoveLine();
+          }
+        }}
       />
     ))}
   </div>
 );
 
-const Order = ({ dishOrders }) => (
+const Order = ({ dishOrders, onRemoveLine }) => (
   <div className="order">
     {dishOrders.map(dishOrder => (
-      <DishOrder key={dishOrder.getDishName()} dishName={dishOrder.getDishName()} lines={dishOrder.getLines()} />
+      <DishOrder
+        key={dishOrder.getDishName()}
+        dishName={dishOrder.getDishName()}
+        lines={dishOrder.getLines()}
+        onRemoveLine={(spiceLevel = null) =>
+          onRemoveLine(dishOrder.getDishName(), spiceLevel)
+        }
+      />
     ))}
   </div>
 );
 
 module.exports = Order;
-;

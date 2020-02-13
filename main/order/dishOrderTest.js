@@ -17,11 +17,11 @@ assertLines(sweetNSourChicken, []);
 assertLines(sweetNSourChicken.add(), [{ quantity: 1 }]);
 assertLines(sweetNSourChicken.add().add(), [{ quantity: 2 }]);
 
-// Remove
+// Remove Line
 assertLines(
   sweetNSourChicken
     .add().add()
-    .remove(),
+    .removeLine(),
   []
 );
 

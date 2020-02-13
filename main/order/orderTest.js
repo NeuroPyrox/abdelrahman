@@ -39,16 +39,16 @@ assertDishOrders(
   [butterChicken.add().changeSpiceLevel("notSpicy", "mild")]
 );
 
-// Remove
+// Remove Line
 assertDishOrders(
-  order.add("Sweet 'n Sour Chicken").remove("Sweet 'n Sour Chicken"),
+  order.add("Sweet 'n Sour Chicken").removeLine("Sweet 'n Sour Chicken"),
   []
 );
 assertDishOrders(
   order
     .add("Butter Chicken")
     .add("Sweet 'n Sour Chicken")
-    .remove("Butter Chicken", "notSpicy")
+    .removeLine("Butter Chicken", "notSpicy")
     .add("Butter Chicken"),
   [sweetNSourChicken.add(), butterChicken.add()]
 );
