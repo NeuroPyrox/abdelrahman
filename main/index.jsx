@@ -33,7 +33,12 @@ class Index extends React.Component {
             this.modifyOrder(order => order.add(dishName))
           }
         />
-        <OrderView dishOrders={this.state.order.getDishOrders()} />
+        <OrderView
+          dishOrders={this.state.order.getDishOrders()}
+          onRemoveLine={(dishName, spiceLevel = null) =>
+            this.modifyOrder(order => order.removeLine(dishName, spiceLevel))
+          }
+        />
       </div>
     );
   }
