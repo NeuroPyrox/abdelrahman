@@ -3,10 +3,10 @@
 const Menu = require("./menu.js");
 const { assert, deepEqual } = require("../../helpers.js");
 
-const assertLines = (order, lines) =>
+const assertDishOrders = (order, dishOrders) =>
   assert(
-    deepEqual(order.getLines(), lines),
-    JSON.stringify(order.getLines(), null, 1)
+    deepEqual(order.getDishOrders(), dishOrders),
+    JSON.stringify(order.getDishOrders(), null, 1)
   );
 
 const menu = new Menu({
@@ -16,10 +16,10 @@ const menu = new Menu({
 
 const order = menu.createOrder();
 
-assertLines(order, []);
+assertDishOrders(order, []);
 
-assertLines(order.add("Sweet 'n Sour Chicken"), [
-  { dishName: "Sweet 'n Sour Chicken", quantity: 1 }
+assertDishOrders(order.add("Sweet 'n Sour Chicken"), [
+  new DishOrder("Sweet 'n Sour Chicken").add()
 ]);
 assertLines(order.add("Sweet 'n Sour Chicken").add("Sweet 'n Sour Chicken"), [
   { dishName: "Sweet 'n Sour Chicken", quantity: 2 }
