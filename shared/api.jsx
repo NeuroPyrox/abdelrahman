@@ -70,18 +70,11 @@ const saveMenu = async menu => {
   await assertResponseIsOk(res);
 };
 
-const loadMenu = async () => {
-  const res = await fetch("/menu");
-  await assertResponseIsOk(res);
-  return res.json();
-};
-
 module.exports = {
   getPublicKey,
   addSubscription,
   removeSubscription,
   hasSubscription,
   getOrders,
-  saveMenu,
-  loadMenu
+  saveMenu
 };
