@@ -36,6 +36,7 @@ class Index extends React.Component {
     if (!this.state.loaded) {
       return null;
     }
+    // TODO make the menu view highlight dishes that are in the order
     return (
       <div>
         <MenuView

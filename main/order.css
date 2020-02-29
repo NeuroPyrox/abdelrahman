@@ -48,3 +48,7 @@
   border: 5px solid var(--spiceColor);
   cursor: default;
 }
+
+.pickupDelivery {
+  --spiceColor: grey;
+}
