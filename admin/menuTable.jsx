@@ -4,8 +4,10 @@ const React = require("react");
 const XButton = require("../shared/xButton.jsx");
 const PlusButton = require("../shared/plusButton.jsx");
 const api = require("../shared/api.jsx");
+const jsonHttp = require("../shared/jsonHttp.jsx");
 const foundBug = require("../shared/foundBug.jsx");
 
+// TODO move these helper functions into a different file
 const replaceField = (object, key, value) => {
   const copy = Object.assign({}, object);
   copy[key] = value;
@@ -69,13 +71,11 @@ const Row = props => (
   </tr>
 );
 
-// TODO figure out how to automate my tests next time
 class MenuTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = { rows: [] };
-    api
-      .loadMenu()
+    jsonHttp.get("/menu")
       .then(menu => this.showMenu(menu))
       .catch(foundBug);
     this.nextKey = 0;

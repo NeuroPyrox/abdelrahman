@@ -1,6 +1,7 @@
 "use strict";
 
-// TODO this is only place jsonHttp is required. Merge it with this file
+// TODO delete this file and only use jsonHttp
+
 const jsonHttp = require("./jsonHttp.jsx");
 
 async function assertResponseIsOk(res) {
@@ -70,18 +71,11 @@ const saveMenu = async menu => {
   await assertResponseIsOk(res);
 };
 
-const loadMenu = async () => {
-  const res = await fetch("/menu");
-  await assertResponseIsOk(res);
-  return res.json();
-};
-
 module.exports = {
   getPublicKey,
   addSubscription,
   removeSubscription,
   hasSubscription,
   getOrders,
-  saveMenu,
-  loadMenu
+  saveMenu
 };

@@ -6,19 +6,26 @@ const Menu = require("./order/menu.js");
 const MenuView = require("./menu.jsx");
 const Order = require("./order/order.js");
 const OrderView = require("./order.jsx");
+const jsonHttp = require("../shared/jsonHttp.jsx");
 require("./index.css");
 
 class Index extends React.Component {
   constructor(props) {
     super(props);
-    // TODO get this from the server instead
-    const menu = new Menu({
-      "Sweet 'n Sour Chicken": { spicy: false },
-      "Butter Chicken": { spicy: true }
-    });
     this.state = {
-      order: new Order(menu)
+      loaded: false
     };
+    this.load();
+  }
+
+  async load() {
+    const menuTable = await jsonHttp.get("/menu");
+    const menu = new Menu(
+      Object.fromEntries(
+        menuTable.map(({ dishName, spicy }) => [dishName, { spicy }])
+      )
+    );
+    this.setState({ order: new Order(menu), menuTable, loaded: true });
   }
 
   modifyOrder(modify) {
@@ -26,9 +33,14 @@ class Index extends React.Component {
   }
 
   render() {
+    if (!this.state.loaded) {
+      return null;
+    }
+    // TODO make the menu view highlight dishes that are in the order
     return (
       <div>
         <MenuView
+          menuTable={this.state.menuTable}
           onClickDish={dishName =>
             this.modifyOrder(order => order.add(dishName))
           }

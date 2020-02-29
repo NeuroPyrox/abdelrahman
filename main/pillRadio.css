@@ -1,0 +1,29 @@
+
+
+.pillRadio {
+  display: flex;
+}
+
+.pillRadio > div {
+  border-radius: 15px;
+  padding: 3px;
+  margin: 3px;
+}
+
+.pillRadio > .unselected {
+  background-color: white;
+  border: 5px solid white;
+  cursor: pointer;
+}
+
+.pillRadio > .halfSelected {
+  background-color: white;
+  border: 5px solid var(--selectedColor);
+  cursor: pointer;
+}
+
+.pillRadio > .selected {
+  background-color: var(--selectedColor);
+  border: 5px solid var(--selectedColor);
+  cursor: default;
+}

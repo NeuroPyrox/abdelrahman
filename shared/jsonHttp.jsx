@@ -1,3 +1,5 @@
+
+// TODO make code style consistent with rest of codebase
 module.exports = {
   get: async function get(url) {
     const res = await fetch(url);

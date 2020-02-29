@@ -3,6 +3,7 @@
 const React = require("react");
 const Button = require("../shared/button.jsx");
 const XButton = require("../shared/xButton.jsx");
+const { PillRadio, PillOption } = require("./pillRadio.jsx");
 require("./order.css");
 
 const spiceOptionStyles = (spiceLevel, selected) => {
@@ -73,9 +74,7 @@ const Line = ({
     </div>
     {spiceLevel ? (
       <SpiceRadio selectedLevel={spiceLevel} onSelect={onChangeSpiceLevel} />
-    ) : (
-      ""
-    )}
+    ) : null}
   </div>
 );
 
@@ -117,6 +116,12 @@ const Order = ({ dishOrders, onRemoveLine, onChangeSpiceLevel }) => (
         }
       />
     ))}
+    {0 < dishOrders.length ? ( // TODO pass whole css class instead of just its name
+      <PillRadio>
+        <PillOption value="pickup" className="pickupDelivery">Pickup</PillOption>
+        <PillOption value="delivery" className="pickupDelivery">Delivery</PillOption>
+      </PillRadio>
+    ) : null}
   </div>
 );
 

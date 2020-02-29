@@ -1,5 +1,7 @@
 "use strict";
 
+// TODO merge this file with menu.jsx
+
 const React = require("react");
 const Button = require("../shared/button.jsx");
 require("./dish.css");
