@@ -14,18 +14,27 @@ const mainPage = `
     />
     <style>
       @import "https://fonts.googleapis.com/css?family=Merienda";
-
-      .pickup {
-        border: 5px solid gray;
-        border-radius: 15px;
-        padding: 3px;
-        font-family: "Merienda";
-        cursor: pointer;
-      }
     </style>
   </head>
   <body>
-    <div class="pickup">Pickup</div>
+    <div id="pickup">Pickup</div>
+    <script>
+      const pickup = document.getElementById("pickup");
+      pickup.style.width = "min-content";
+      pickup.style.border = "5px solid white";
+      pickup.style.borderRadius = "15px";
+      pickup.style.padding = "3px";
+      pickup.style.fontFamily = "Merienda";
+      pickup.style.cursor = "pointer"
+
+      pickup.addEventListener("mouseenter", e => {
+        pickup.style.borderColor = "lightgray";
+      })
+
+      pickup.addEventListener("mouseleave", e => {
+        pickup.style.borderColor = "white"
+      })
+    </script>
   </body>
 </html>
 `;
