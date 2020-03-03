@@ -5,15 +5,12 @@
 }
 
 .pillRadio > div {
-  border-radius: 15px;
-  padding: 3px;
   margin: 3px;
 }
 
 .pillRadio > .unselected {
   background-color: white;
   border: 5px solid white;
-  cursor: pointer;
 }
 
 .pillRadio > .halfSelected {

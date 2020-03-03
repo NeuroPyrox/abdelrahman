@@ -12,12 +12,23 @@ const mainPage = `
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
+    <style>
+      @import "https://fonts.googleapis.com/css?family=Merienda";
+
+      .pickup {
+        border: 5px solid gray;
+        border-radius: 15px;
+        padding: 3px;
+        font-family: "Merienda";
+        cursor: pointer;
+      }
+    </style>
   </head>
   <body>
-    Main page
+    <div class="pickup">Pickup</div>
   </body>
 </html>
-`
+`;
 
 http
   .createServer((req, res) => {
