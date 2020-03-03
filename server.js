@@ -21,55 +21,36 @@ const mainPage = `
     <div id="pickup">Pickup</div>
     <div id="delivery">Delivery</div>
     <script>
-      const pickup = document.getElementById("pickup");
-      pickup.style.width = "min-content";
-      pickup.style.border = "5px solid white";
-      pickup.style.borderRadius = "15px";
-      pickup.style.padding = "3px";
-      pickup.style.fontFamily = "Merienda";
-      pickup.style.cursor = "pointer"
+      const stylizeButton = id => {
+        button = document.getElementById(id)
 
-      pickup.addEventListener("mouseenter", e => {
-        pickup.style.borderColor = "lightgray";
-      })
+        button.style.width = "min-content";
+        button.style.border = "5px solid white";
+        button.style.borderRadius = "15px";
+        button.style.padding = "3px";
+        button.style.fontFamily = "Merienda";
+        button.style.cursor = "pointer"
 
-      pickup.addEventListener("mouseleave", e => {
-        pickup.style.borderColor = "white"
-        pickup.style.backgroundColor = "white"
-      })
+        button.addEventListener("mouseenter", e => {
+          button.style.borderColor = "lightgray";
+        })
 
-      pickup.addEventListener("mousedown", e => {
-        pickup.style.backgroundColor = "lightgray"
-      })
+        button.addEventListener("mouseleave", e => {
+          button.style.borderColor = "white"
+          button.style.backgroundColor = "white"
+        })
 
-      pickup.addEventListener("mouseup", e => {
-        pickup.style.backgroundColor = "white"
-      })
+        button.addEventListener("mousedown", e => {
+          button.style.backgroundColor = "lightgray"
+        })
 
-      const delivery = document.getElementById("delivery");
-      delivery.style.width = "min-content";
-      delivery.style.border = "5px solid white";
-      delivery.style.borderRadius = "15px";
-      delivery.style.padding = "3px";
-      delivery.style.fontFamily = "Merienda";
-      delivery.style.cursor = "pointer"
+        button.addEventListener("mouseup", e => {
+          button.style.backgroundColor = "white"
+        })
+      }
 
-      delivery.addEventListener("mouseenter", e => {
-        delivery.style.borderColor = "lightgray";
-      })
-
-      delivery.addEventListener("mouseleave", e => {
-        delivery.style.borderColor = "white"
-        delivery.style.backgroundColor = "white"
-      })
-
-      delivery.addEventListener("mousedown", e => {
-        delivery.style.backgroundColor = "lightgray"
-      })
-
-      delivery.addEventListener("mouseup", e => {
-        delivery.style.backgroundColor = "white"
-      })
+      stylizeButton("pickup")
+      stylizeButton("delivery")
     </script>
   </body>
 </html>
