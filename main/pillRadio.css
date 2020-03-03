@@ -8,17 +8,6 @@
   margin: 3px;
 }
 
-.pillRadio > .unselected {
-  background-color: white;
-  border: 5px solid white;
-}
-
-.pillRadio > .halfSelected {
-  background-color: white;
-  border: 5px solid var(--selectedColor);
-  cursor: pointer;
-}
-
 .pillRadio > .selected {
   background-color: var(--selectedColor);
   border: 5px solid var(--selectedColor);
