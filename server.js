@@ -12,12 +12,14 @@ const mainPage = `
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
-    <style>
-      @import "https://fonts.googleapis.com/css?family=Merienda";
-    </style>
+    <link
+      href="https://fonts.googleapis.com/css?family=Merienda"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <div id="pickup">Pickup</div>
+    <div id="delivery">Delivery</div>
     <script>
       const pickup = document.getElementById("pickup");
       pickup.style.width = "min-content";
@@ -33,6 +35,22 @@ const mainPage = `
 
       pickup.addEventListener("mouseleave", e => {
         pickup.style.borderColor = "white"
+      })
+
+      const delivery = document.getElementById("delivery");
+      delivery.style.width = "min-content";
+      delivery.style.border = "5px solid white";
+      delivery.style.borderRadius = "15px";
+      delivery.style.padding = "3px";
+      delivery.style.fontFamily = "Merienda";
+      delivery.style.cursor = "pointer"
+
+      delivery.addEventListener("mouseenter", e => {
+        delivery.style.borderColor = "lightgray";
+      })
+
+      delivery.addEventListener("mouseleave", e => {
+        delivery.style.borderColor = "white"
       })
     </script>
   </body>
