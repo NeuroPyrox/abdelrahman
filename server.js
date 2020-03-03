@@ -35,6 +35,15 @@ const mainPage = `
 
       pickup.addEventListener("mouseleave", e => {
         pickup.style.borderColor = "white"
+        pickup.style.backgroundColor = "white"
+      })
+
+      pickup.addEventListener("mousedown", e => {
+        pickup.style.backgroundColor = "lightgray"
+      })
+
+      pickup.addEventListener("mouseup", e => {
+        pickup.style.backgroundColor = "white"
       })
 
       const delivery = document.getElementById("delivery");
@@ -51,6 +60,15 @@ const mainPage = `
 
       delivery.addEventListener("mouseleave", e => {
         delivery.style.borderColor = "white"
+        delivery.style.backgroundColor = "white"
+      })
+
+      delivery.addEventListener("mousedown", e => {
+        delivery.style.backgroundColor = "lightgray"
+      })
+
+      delivery.addEventListener("mouseup", e => {
+        delivery.style.backgroundColor = "white"
       })
     </script>
   </body>
