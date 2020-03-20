@@ -1,0 +1,33 @@
+> 4 + 5
+9
+> ' a
+'a'
+> ' 2 toNum
+2
+> ' a toNum
+nil
+> set a !a.a
+> a a
+'a'
+> set a !a!b.b
+> a ab
+'b'
+> !a!b a xy
+'x'
+> !a!b b xy
+'y'
+> !a!b ((a toInt) * (b toInt)) 45
+20
+> countA := loop ?self?count=0!char (
+.   if (char = 'a') (
+.     self (count + 1)
+.   ) else (
+.     count
+.   )
+. )
+> countA b
+0
+> countA aaaaaab
+6
+> Y := ?f.(?x.f(x x) ?x.f(x x))
+> loop :=

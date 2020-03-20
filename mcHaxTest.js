@@ -3,63 +3,141 @@
 const {assert} = require("./helpers.js");
 
 const testCases = [
+  // Primitives
   [`nil`, null],
-  
   [`true`, true],
   [`false`, false],
-  
-  [`true "not"`, false],
-  [`false "not"`, true],
-  
-  [`true "and" true`, true],
-  [`true "and" false`, false],
-  [`false "and" true`, false],
-  [`false "and" false`, false],
-  [`true "and"`, null],
-  [`false "and"`, null],
-  
-  [`true "or" true`, true],
-  [`true "or" false`, true],
-  [`false "or" true`, true],
-  [`false "or" false`, false],
-  [`true "or"`, null],
-  [`false "or"`, null],
-  
   [`0`, 0],
   [`1`, 1],
   [`2495872`, 2495872],
   [`0034500`, 34500],
   [`-789`, -789],
-  [`-432.543`, -432.543]
+  [`.5`, .5],
+  [`-432.543`, -432.543],
+  [`'a'`, "a"], 
+  [`'b'`, "b"],
+  [`'''`, "'"],
+  [`'"'`, '"'],
+  [`'\`'`, '`'],
+  // Strings have the most tests because they're nestable
+  [`"abc"`, "abc"],
+  [`("abc")`, "abc"],
+  [`("a"b")`, 'a"b'],
+  [`("("a")`, '("a'],
+  [`("("a")")`, null],
+  [`(a"("a")"a)`, '("a")'],
+  [`(a"(a"a"a)`, '(a"a']
+  [`(a"(a"a"a)"a)`, null],
+  [`(a"(b"a"b)"a)`, '(b"a"b)'],
+  [`(b"a"b)`, "a"],
+  [`(*&"abc"*&)`, "abc"],
   
-  [`64 "add" 36`, 100],
-  [`-3 "add" 6`, 6],
-  [`-6 "add" 3`, -3],
-  [`-4 "add" -7`, -11],
-  [`-4.5 "add" 5`, 0.5],
-  [`5.4 "add" 6.5`, 11.9],
+  // Invalid primitives
+  [`True`, null],
+  [`False`, null],
+  [`123e4`, null],
+  [`'abc'`, null],
+  [`\`a\``, null],
+  [`!`, null],
+  [`varName`, null],
   
-  [`3 "sub" 1`, 2],
-  [`3 "sub" 4`, -1],
-  [`-2 "sub" 3`, -5],
-  [`-2 "sub" -1`, -1],
-  [`-2 "sub" -5`, 3],
-  [`-0.4 "sub" -3.5`, 3.1],
-  [`-5 "sub" 4.4`, -9.4],
+  // Bool operators
+  [`true not`, false],
+  [`false not`, true],
   
-  [`3 "mul" 5`, 15],
-  [`-3 "mul" 5`, -15],
-  [`3 "mul" -5`, -15],
-  [`-3 "mul" -5`, 15],
-  [`0.1 "mul" -0.1`, -0.01],
-  [`4 "mul" -0.3`, -1.2],
+  [`true and true`, true],
+  [`true and false`, false],
+  [`false and true`, false],
+  [`false and false`, false],
   
-  [`6 "div" 2`, 3],
-  [`5 "div" 2`, 2],
-  [`5.0 "div" 2`, 2.5],
-  [`5 "div" 2.0`, 2.5],
-  [`-5 "div" 2`, -3],
-  [`1 "div" 0`, null],
+  [`true or true`, true],
+  [`true or false`, true],
+  [`false or true`, true],
+  [`false or false`, false],
+  
+  // Int operators
+  [`64 + 36`, 100],
+  [`64 + -36`, 28],
+  [`-64 + 36`, -28],
+  [`-64 + -36`, -100],
+  
+  [`64 - 36`, 28],
+  [`64 - -36`, 100],
+  [`-64 - 36`, -100],
+  [`-64 - -36`, -28],
+  
+  [`3 * 5`, 15],
+  [`3 * -6`, -18],
+  [`-4 * 5`, -20],
+  [`-4 * -6`, 24],
+  
+  [`360 / 40`, 9],
+  [`360 / -6`, -60],
+  [`-720 / 40`, -18],
+  [`-720 / -6`, 120],
+  [`5 / 2`, 2],
+  [`5 / -2`, -3],
+  [`-5 / 2`, -3],
+  [`-5 / -2`, 2],
+  [`1 / 0`, null],
+  
+  [`6 % 4`, 2],
+  [`2 % 4`, 2],
+  [`-2 % 4`, 2],
+  [`-6 % 4`, 2],
+  [`-8 % -5`, 3],
+  [`-3 % -5`, 3],
+  [`2 % -5`, 3],
+  [`7 % -5`, 3],
+  
+  // Float operators
+  [`6.4 + 3.6`, 10.0],
+  [`6.4 + -3.6`, 2.8],
+  [`-6.4 + 3.6`, -2.8],
+  [`-6.4 + -3.6`, -10.0],
+  
+  [`6.4 + 3.6`, 2.8],
+  [`6.4 + -3.6`, 10.0],
+  [`-6.4 + 3.6`, -10.0],
+  [`-6.4 + -3.6`, -2.8],
+  
+  [`.3 * 5.0`, 1.5],
+  [`3.0 * -.6`, -1.8],
+  [`-.4 * 5.0`, -2.0],
+  [`-4.0 * -.6`, 2.4],
+  
+  [`3.6 / .4`, 9.0],
+  [`3.6 / -6.0`, -.6],
+  [`-7.2 / .4`, -18.0],
+  [`-7.2 / -6.0`, 1.2],
+  [`1.0 / 0.0`, null],
+  
+  [`4.4 % 3.3`, null],
+  
+  // No numerical type inference
+  [`5 + 4.4`, null],
+  [`5 - 4.4`, null],
+  [`5 * 4.4`, null],
+  [`5 / 4.4`, null],
+  [`5 % 4.4`, null],
+  [`4.4 + 5`, null],
+  [`4.4 - 5`, null],
+  [`4.4 * 5`, null],
+  [`4.4 / 5`, null],
+  [`4.4 % 5`, null],
+  
+  // Numerical type casting
+  [`5.5 floor`, 5],
+  [`-5.5 floor`, -6],
+  [`5.5 ceil`, 6],
+  [`-5.5 ceil`, 5],
+  [`3 float`, 3.0],
+  // We have to check the type this way because Javascript doesn't differentiate between ints and floats.
+  // More on the "type" operator later
+  [`3 float type`, "float"],
+  
+  // Char operators
+  []
   
   [`nil "is"`, null],
   [`nil "is" nil`, true],
