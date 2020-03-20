@@ -1,7 +1,5 @@
 "use strict";
 
-// TODO move all this logic to server.js
-
 require("./test.js");
 
 const {asyncHandler} = require("./helpers.js")
@@ -55,7 +53,6 @@ startServer({
   "/": services.staticFile("/main/index.html"),
   "/admin/": services.redirect("/admin"),
   "/admin": services.staticFile("/admin/index.html"),
-  "/test": services.staticFile("/test/index.html"),
 
   "/main/bundle.js": services.staticFile("/main/bundle.js"),
   "/main/style.css": services.staticFile("/main/style.css"),
