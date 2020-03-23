@@ -6,60 +6,6 @@ const XButton = require("../shared/xButton.jsx");
 const { PillRadio, PillOption } = require("./pillRadio.jsx");
 require("./order.css");
 
-const spiceOptionStyles = (spiceLevel, selected) => {
-  if (selected) {
-    return [
-      spiceLevel + " selected",
-      spiceLevel + " selected",
-      spiceLevel + " selected"
-    ];
-  } else {
-    return [
-      spiceLevel + " unselected",
-      spiceLevel + " halfSelected",
-      spiceLevel + " selected"
-    ];
-  }
-};
-
-const formatSpiceLevel = {
-  notSpicy: "Not Spicy",
-  mild: "Mild",
-  hot: "Hot"
-};
-
-const SpiceOption = ({ spiceLevel, selected, onSelect }) => {
-  const [defaultStyle, hoverStyle, clickStyle] = spiceOptionStyles(
-    spiceLevel,
-    selected
-  );
-  return (
-    <Button
-      key={spiceLevel}
-      defaultStyle={defaultStyle}
-      hoverStyle={hoverStyle}
-      clickStyle={clickStyle}
-      onClick={onSelect}
-    >
-      {formatSpiceLevel[spiceLevel]}
-    </Button>
-  );
-};
-
-// Not really a radio. It just acts like one
-const SpiceRadio = ({ selectedLevel, onSelect }) => (
-  <div className="spiceRadio">
-    {["notSpicy", "mild", "hot"].map(spiceLevel => (
-      <SpiceOption
-        key={spiceLevel}
-        spiceLevel={spiceLevel}
-        selected={selectedLevel === spiceLevel}
-        onSelect={() => onSelect(spiceLevel)}
-      />
-    ))}
-  </div>
-);
-
 const Line = ({
   dishName,
   quantity,
@@ -72,9 +18,6 @@ const Line = ({
       <h4>{`${quantity}x ${dishName}`}</h4>
       <XButton onClick={onRemove} />
     </div>
-    {spiceLevel ? (
-      <SpiceRadio selectedLevel={spiceLevel} onSelect={onChangeSpiceLevel} />
-    ) : null}
   </div>
 );
 
